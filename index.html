@@ -675,6 +675,7 @@
         </div>
       </div>
       <button class="btn btn-gold setup-start" id="btn-create" onclick="createBin()">Crear mi programa →</button>
+      <button class="btn btn-ghost setup-start" id="btn-cancel-edit" style="display:none;margin-top:8px" onclick="cancelEditInfo()">Cancelar</button>
     </div>
 
     <!-- Tab: Join -->
@@ -860,6 +861,38 @@ const CAT_LABELS = {
   prep: 'Preparación', glam: 'Belleza', foto: 'Fotografía',
   evento: 'Ceremonia', fiesta: 'Fiesta', other: 'Otro'
 };
+
+// ── PROGRAMA BASE (precargado en cada boda nueva) ──────
+const DEFAULT_EVENTS = [
+  { name:'Despertarse, ducharse',          hour:8,  minute:0,  duration:40,  cat:'prep',   notes:'', highlight:false },
+  { name:'Desayunar',                      hour:8,  minute:40, duration:30,  cat:'prep',   notes:'', highlight:false },
+  { name:'Peluquería y maquillaje',        hour:9,  minute:10, duration:120, cat:'glam',   notes:'', highlight:false },
+  { name:'A vestirse',                     hour:11, minute:10, duration:30,  cat:'glam',   notes:'', highlight:false },
+  { name:'Almuerzo ligero',                hour:11, minute:40, duration:95,  cat:'prep',   notes:'', highlight:false },
+  { name:'Llega el fotógrafo',             hour:13, minute:15, duration:15,  cat:'foto',   notes:'', highlight:false },
+  { name:'Sesión de fotos',                hour:13, minute:30, duration:60,  cat:'foto',   notes:'', highlight:false },
+  { name:'Fotos con la familia',           hour:14, minute:30, duration:15,  cat:'foto',   notes:'', highlight:false },
+  { name:'Llegan los invitados',           hour:14, minute:45, duration:15,  cat:'evento', notes:'', highlight:false },
+  { name:'Llega la limusina',              hour:15, minute:0,  duration:30,  cat:'evento', notes:'', highlight:false },
+  { name:'Entrada a la ceremonia',         hour:15, minute:30, duration:30,  cat:'evento', notes:'', highlight:false },
+  { name:'¡Sí, quiero!',                   hour:16, minute:0,  duration:15,  cat:'evento', notes:'', highlight:true  },
+  { name:'Cóctel y fotos',                 hour:16, minute:15, duration:20,  cat:'foto',   notes:'', highlight:false },
+  { name:'Vamos a la celebración',         hour:16, minute:35, duration:40,  cat:'evento', notes:'', highlight:false },
+  { name:'Entrada triunfal',               hour:17, minute:15, duration:20,  cat:'fiesta', notes:'', highlight:false },
+  { name:'Primer baile',                   hour:17, minute:35, duration:25,  cat:'fiesta', notes:'', highlight:true  },
+  { name:'Cena',                           hour:18, minute:0,  duration:40,  cat:'evento', notes:'', highlight:false },
+  { name:'¡Brindis!',                      hour:18, minute:40, duration:40,  cat:'evento', notes:'', highlight:false },
+  { name:'¡Fiesta!',                       hour:19, minute:20, duration:100, cat:'fiesta', notes:'', highlight:false },
+  { name:'Cortamos el pastel',             hour:21, minute:0,  duration:60,  cat:'fiesta', notes:'', highlight:true  },
+  { name:'Fuegos artificiales y clausura', hour:22, minute:0,  duration:30,  cat:'fiesta', notes:'', highlight:false },
+  { name:'¡Gran salida! Vamos a la cama :)', hour:22, minute:30, duration:30, cat:'fiesta', notes:'', highlight:false },
+];
+
+function freshDefaultEvents() {
+  // clona el programa base con ids nuevos, para que cada boda tenga su propia copia
+  return DEFAULT_EVENTS.map(ev => ({ id: uid(), ...ev }));
+}
+
 const SECTION_BREAKS = [
   { from: 0,  label: 'Madrugada' },
   { from: 6,  label: 'Mañana — preparación' },
@@ -1024,7 +1057,7 @@ async function createBin() {
   btn.textContent = 'Creando...';
 
   state.couple = { names, date, venue };
-  state.events = [];
+  state.events = freshDefaultEvents();
 
   try {
     const binId = await createBinRemote({ state, code: null });
@@ -1190,6 +1223,35 @@ function resetApp() {
   document.getElementById('setup-names').value = state.couple.names;
   document.getElementById('setup-date').value = state.couple.date;
   document.getElementById('setup-venue').value = state.couple.venue;
+
+  // Si ya existe una boda (currentBinId), estamos EDITANDO info, no creando otra.
+  const btn = document.getElementById('btn-create');
+  const cancelBtn = document.getElementById('btn-cancel-edit');
+  if (currentBinId) {
+    btn.textContent = 'Guardar cambios →';
+    btn.onclick = saveEditedInfo;
+    if (cancelBtn) cancelBtn.style.display = '';
+  } else {
+    btn.textContent = 'Crear mi programa →';
+    btn.onclick = createBin;
+    if (cancelBtn) cancelBtn.style.display = 'none';
+  }
+}
+
+async function saveEditedInfo() {
+  const names = document.getElementById('setup-names').value.trim();
+  const date  = document.getElementById('setup-date').value;
+  const venue = document.getElementById('setup-venue').value.trim();
+  if (!names) { showToast('Por favor ingresa los nombres 💍'); return; }
+
+  state.couple = { names, date, venue };
+  await save();
+  showApp();
+  showToast('Información actualizada ✓', true);
+}
+
+function cancelEditInfo() {
+  showApp();
 }
 
 function clearAll() {
