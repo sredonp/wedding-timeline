@@ -509,6 +509,42 @@
   }
   .time-sep { color: var(--muted); font-size: 18px; font-weight: 600; }
 
+  .nextday-chip {
+    display: block;
+    margin-top: 8px;
+    font-size: 11.5px;
+    font-family: var(--font-body);
+    color: var(--muted);
+    background: none;
+    border: 1px dashed var(--line);
+    border-radius: 20px;
+    padding: 6px 12px;
+    cursor: pointer;
+    letter-spacing: .01em;
+    text-align: center;
+    width: 100%;
+    transition: all .15s;
+  }
+  .nextday-chip:hover { border-color: var(--rose); color: var(--rose); }
+  .nextday-chip.active {
+    color: var(--plum);
+    background: #F1E6D8;
+    border: 1px solid var(--gold);
+    font-weight: 600;
+  }
+
+  .ev-nextday-tag {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 10px;
+    color: var(--plum);
+    background: #F1E6D8;
+    border: 1px solid var(--gold);
+    border-radius: 20px;
+    padding: 1px 8px;
+    letter-spacing: .01em;
+  }
+
   /* ── TOAST ── */
   .toast {
     position: fixed;
@@ -724,7 +760,7 @@
       <span class="sync-badge" id="sync-badge" title="Estado de sincronización">●</span>
       <button class="btn btn-ghost btn-sm" onclick="showShareModal()" title="Compartir código">🔗</button>
       <button class="btn btn-ghost btn-sm" onclick="exportPDF()">⬇ PDF</button>
-      <button class="btn btn-accent btn-sm" onclick="openAddModal()">+ Evento</button>
+      <button class="btn btn-accent btn-sm" onclick="openAddModal()">+ Momento</button>
     </div>
   </div>
 
@@ -746,7 +782,7 @@
     <div id="timeline-list"></div>
     <div class="add-btn-wrap">
       <button class="btn-add" onclick="openAddModal()">
-        <span style="font-size:16px;line-height:1">+</span> Añadir evento
+        <span style="font-size:16px;line-height:1">+</span> Añadir momento
       </button>
     </div>
   </div>
@@ -776,11 +812,11 @@
 <!-- ADD/EDIT MODAL -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
-    <div class="modal-title" id="modal-title">Añadir evento</div>
+    <div class="modal-title" id="modal-title">Añadir momento</div>
     <div class="modal-fields">
       <div>
-        <div class="field-label">Nombre del evento</div>
-        <input class="field-input" id="ev-name" type="text" placeholder="Ej: Sesión de fotos" maxlength="80">
+        <div class="field-label">Nombre del momento</div>
+        <input class="field-input" id="ev-name" type="text" placeholder="Ej: Hora loca" maxlength="80">
       </div>
       <div>
         <div class="field-label">Hora de inicio</div>
@@ -789,6 +825,7 @@
           <span class="time-sep">:</span>
           <input class="time-part" id="ev-minutes" type="number" min="0" max="59" placeholder="MM" value="00">
         </div>
+        <button type="button" class="nextday-chip" id="ev-nextday-chip" onclick="toggleNextDay()">+ Es de madrugada del día siguiente</button>
       </div>
       <div class="modal-row">
         <div>
@@ -813,12 +850,12 @@
       </div>
       <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:4px 0">
         <input type="checkbox" id="ev-highlight" style="width:16px;height:16px;accent-color:var(--gold)">
-        <span style="font-size:13px;color:var(--muted)">⭐ Destacar este evento</span>
+        <span style="font-size:13px;color:var(--muted)">⭐ Destacar este momento</span>
       </label>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-gold" onclick="saveEvent()">Guardar evento</button>
+      <button class="btn btn-gold" onclick="saveEvent()">Guardar momento</button>
     </div>
   </div>
 </div>
@@ -837,6 +874,7 @@ let state = {
   events: []
 };
 let editingId = null;
+let pendingNextDay = false; // whether the event being added/edited is in the early hours of the next day
 let currentBinId = null;   // JSONBin bin ID (raw)
 let currentCode = null;    // human-readable code (e.g. ABC-7X2)
 let syncPending = false;
@@ -1231,11 +1269,11 @@ function cancelEditInfo() {
 }
 
 function clearAll() {
-  if (!confirm('¿Eliminar todos los eventos? Esta acción no se puede deshacer.')) return;
+  if (!confirm('¿Eliminar todos los momentos? Esta acción no se puede deshacer.')) return;
   state.events = [];
   save();
   renderTimeline();
-  showToast('Eventos eliminados');
+  showToast('Momentos eliminados');
 }
 
 // ── BANNER ─────────────────────────────────────────────
@@ -1263,10 +1301,14 @@ function fmtDur(min) {
   const h = Math.floor(min/60), rm = min%60;
   return rm ? `${h}h ${rm}min` : `${h}h`;
 }
-function getSectionLabel(h) {
+function minutesOf(ev) {
+  return (ev.hour + (ev.nextDay ? 24 : 0)) * 60 + ev.minute;
+}
+function getSectionLabel(ev) {
+  if (ev.nextDay) return 'Ya de madrugada · día siguiente';
   let label = null;
   for (const s of SECTION_BREAKS) {
-    if (h >= s.from) label = s.label;
+    if (ev.hour >= s.from) label = s.label;
     else break;
   }
   return label;
@@ -1292,15 +1334,15 @@ function initSortable() {
 
 function renderTimeline() {
   const list = document.getElementById('timeline-list');
-  const sorted = [...state.events].sort((a,b) => a.hour*60+a.minute - (b.hour*60+b.minute));
+  const sorted = [...state.events].sort((a,b) => minutesOf(a) - minutesOf(b));
   state.events = sorted;
 
   if (!state.events.length) {
     list.innerHTML = `
       <div class="empty-state">
         <div class="empty-state-icon">📋</div>
-        <h3>No hay eventos aún</h3>
-        <p>Añade el primero de tu gran día</p>
+        <h3>No hay momentos aún</h3>
+        <p>Añade el primer momento de tu gran día</p>
       </div>`;
     return;
   }
@@ -1309,7 +1351,7 @@ function renderTimeline() {
   let lastSection = null;
 
   state.events.forEach((ev, i) => {
-    const section = getSectionLabel(ev.hour);
+    const section = getSectionLabel(ev);
     if (section !== lastSection) {
       lastSection = section;
       html += `<div class="phase-label">${section}</div>`;
@@ -1325,6 +1367,7 @@ function renderTimeline() {
       <div class="ev-time-col" onclick="quickEditTime('${ev.id}')">
         <div class="ev-time">${fmtTime(ev.hour, ev.minute)}</div>
         <div class="ev-duration">${fmtDur(ev.duration)}</div>
+        ${ev.nextDay ? '<span class="ev-nextday-tag">🌙 día siguiente</span>' : ''}
       </div>
       <div class="ev-icon-col">
         <button class="ev-icon-btn" type="button" style="border-color:${color}66" onclick="openEditModal('${ev.id}')" title="${catLabel}">${icon}</button>
@@ -1359,9 +1402,24 @@ function escHtml(s) {
 // ── EVENTS CRUD ────────────────────────────────────────
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
+function updateNextDayChip() {
+  const chip = document.getElementById('ev-nextday-chip');
+  if (!chip) return;
+  chip.classList.toggle('active', pendingNextDay);
+  chip.textContent = pendingNextDay
+    ? '🌙 Es de madrugada · día siguiente'
+    : '+ Es de madrugada del día siguiente';
+}
+
+function toggleNextDay() {
+  pendingNextDay = !pendingNextDay;
+  updateNextDayChip();
+}
+
 function openAddModal() {
   editingId = null;
-  document.getElementById('modal-title').textContent = 'Añadir evento';
+  pendingNextDay = false;
+  document.getElementById('modal-title').textContent = 'Añadir momento';
   document.getElementById('ev-name').value = '';
   document.getElementById('ev-hours').value = '08';
   document.getElementById('ev-minutes').value = '00';
@@ -1369,6 +1427,7 @@ function openAddModal() {
   document.getElementById('ev-category').value = 'prep';
   document.getElementById('ev-notes').value = '';
   document.getElementById('ev-highlight').checked = false;
+  updateNextDayChip();
   document.getElementById('modal').classList.add('open');
   setTimeout(() => document.getElementById('ev-name').focus(), 100);
 }
@@ -1377,7 +1436,8 @@ function openEditModal(id) {
   const ev = state.events.find(e => e.id === id);
   if (!ev) return;
   editingId = id;
-  document.getElementById('modal-title').textContent = 'Editar evento';
+  pendingNextDay = !!ev.nextDay;
+  document.getElementById('modal-title').textContent = 'Editar momento';
   document.getElementById('ev-name').value = ev.name;
   document.getElementById('ev-hours').value = String(ev.hour).padStart(2,'0');
   document.getElementById('ev-minutes').value = String(ev.minute).padStart(2,'0');
@@ -1385,6 +1445,7 @@ function openEditModal(id) {
   document.getElementById('ev-category').value = ev.cat;
   document.getElementById('ev-notes').value = ev.notes || '';
   document.getElementById('ev-highlight').checked = !!ev.highlight;
+  updateNextDayChip();
   document.getElementById('modal').classList.add('open');
 }
 
@@ -1402,25 +1463,26 @@ function saveEvent() {
   const cat = document.getElementById('ev-category').value;
   const notes = document.getElementById('ev-notes').value.trim();
   const highlight = document.getElementById('ev-highlight').checked;
+  const nextDay = pendingNextDay;
 
   if (editingId) {
     const idx = state.events.findIndex(e => e.id === editingId);
-    if (idx !== -1) state.events[idx] = { ...state.events[idx], name, hour, minute, duration, cat, notes, highlight };
+    if (idx !== -1) state.events[idx] = { ...state.events[idx], name, hour, minute, duration, cat, notes, highlight, nextDay };
   } else {
-    state.events.push({ id: uid(), name, hour, minute, duration, cat, notes, highlight });
+    state.events.push({ id: uid(), name, hour, minute, duration, cat, notes, highlight, nextDay });
   }
   save();
   closeModal();
   renderTimeline();
-  showToast(editingId ? 'Evento actualizado ✓' : 'Evento añadido ✓');
+  showToast(editingId ? 'Momento actualizado ✓' : 'Momento añadido ✓');
 }
 
 function deleteEvent(id) {
-  if (!confirm('¿Eliminar este evento?')) return;
+  if (!confirm('¿Eliminar este momento?')) return;
   state.events = state.events.filter(e => e.id !== id);
   save();
   renderTimeline();
-  showToast('Evento eliminado');
+  showToast('Momento eliminado');
 }
 
 function updateName(id, el) {
@@ -1447,7 +1509,7 @@ function showToast(msg, gold = false) {
 
 // ── PDF EXPORT ─────────────────────────────────────────
 function exportPDF() {
-  if (!state.events.length) { showToast('Añade eventos primero'); return; }
+  if (!state.events.length) { showToast('Añade momentos primero'); return; }
   showToast('Generando PDF...', true);
 
   const { jsPDF } = window.jspdf;
@@ -1500,9 +1562,10 @@ function exportPDF() {
 
   let y = 63;
   let lastSec = null;
+  const pdfEvents = [...state.events].sort((a,b) => minutesOf(a) - minutesOf(b));
 
-  state.events.forEach((ev, i) => {
-    const sec = getSectionLabel(ev.hour);
+  pdfEvents.forEach((ev, i) => {
+    const sec = getSectionLabel(ev);
     if (sec !== lastSec) {
       lastSec = sec;
       if (y > 63) y += 4;
@@ -1540,7 +1603,7 @@ function exportPDF() {
     } else {
       doc.setTextColor(46, 36, 48);
     }
-    doc.text(ev.name, 52, y);
+    doc.text(ev.name + (ev.nextDay ? '  🌙' : ''), 52, y);
 
     // Duration
     doc.setFontSize(8);
@@ -1558,7 +1621,7 @@ function exportPDF() {
     }
 
     // Connector line
-    if (i < state.events.length - 1) {
+    if (i < pdfEvents.length - 1) {
       doc.setDrawColor(228, 217, 200);
       doc.setLineWidth(0.3);
       doc.line(22, y + 2, 22, y + 8);
