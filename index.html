@@ -3,12 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="theme-color" content="#1a1a2e">
+<meta name="theme-color" content="#FBF6EF">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Mi Boda">
 <title>Programa del Día — @senenphotography</title>
 <link rel="manifest" href="#" id="manifest-placeholder">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- jsPDF for PDF export -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -17,50 +20,49 @@
 
 <style>
   :root {
-    --bg: #0f0f1a;
-    --surface: #1a1a2e;
-    --surface2: #222238;
-    --surface3: #2a2a42;
-    --border: rgba(255,255,255,0.08);
-    --border2: rgba(255,255,255,0.15);
-    --gold: #c9a84c;
-    --gold-light: #e8c97a;
-    --gold-dim: rgba(201,168,76,0.15);
-    --text: #f0ece3;
-    --text2: #a8a4a0;
-    --text3: #6b6870;
-    --accent: #7b68ee;
-    --accent-dim: rgba(123,104,238,0.15);
-    --danger: #e05555;
-    --radius: 12px;
-    --radius-sm: 8px;
-    --font-display: 'Georgia', 'Times New Roman', serif;
-    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --ink:#2E2430;
+    --paper:#FBF6EF;
+    --card:#FFFEFB;
+    --rose:#C97B84;
+    --sage:#7C8B6F;
+    --plum:#4B3A52;
+    --gold:#B08D57;
+    --gold-light:#CBA875;
+    --line:#E4D9C8;
+    --muted:#8B8078;
+    --danger:#B5453D;
+    --radius:16px;
+    --radius-sm:9px;
+    --font-display:'Cormorant Garamond', serif;
+    --font-body:'Work Sans', sans-serif;
 
-    /* category colors */
-    --cat-prep: #5b9bd5;
-    --cat-glam: #c47db8;
-    --cat-foto: #5bba8f;
-    --cat-evento: #e8a23c;
-    --cat-fiesta: #7b68ee;
-    --cat-other: #8a8a9a;
+    --cat-prep:#7C8B6F;
+    --cat-glam:#C97B84;
+    --cat-foto:#B08D57;
+    --cat-evento:#4B3A52;
+    --cat-fiesta:#8A6A9A;
+    --cat-other:#8B8078;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     font-family: var(--font-body);
-    background: var(--bg);
-    color: var(--text);
+    background: var(--paper);
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(201,123,132,0.08), transparent 40%),
+      radial-gradient(circle at 85% 92%, rgba(124,139,111,0.08), transparent 40%);
+    color: var(--ink);
     min-height: 100vh;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
 
   /* ── HEADER ── */
   .header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 14px 20px;
+    background: rgba(251,246,239,0.92);
+    border-bottom: 1px solid var(--line);
+    padding: 14px 22px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -77,7 +79,7 @@
   .brand-icon {
     width: 32px;
     height: 32px;
-    background: var(--gold-dim);
+    background: var(--card);
     border: 1px solid var(--gold);
     border-radius: 50%;
     display: flex;
@@ -89,28 +91,32 @@
   }
   .brand-name {
     font-family: var(--font-display);
-    font-size: 13px;
-    color: var(--gold);
-    letter-spacing: 0.05em;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--plum);
+    letter-spacing: 0.02em;
     line-height: 1.2;
   }
   .brand-sub {
     font-size: 10px;
-    color: var(--text3);
+    color: var(--muted);
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
   .header-actions {
     display: flex;
+    align-items: center;
     gap: 8px;
   }
   .btn {
     border: none;
-    border-radius: var(--radius-sm);
+    border-radius: 30px;
     cursor: pointer;
     font-size: 13px;
     font-family: var(--font-body);
-    padding: 8px 14px;
+    font-weight: 600;
+    padding: 9px 16px;
     transition: all 0.15s;
     display: flex;
     align-items: center;
@@ -119,27 +125,27 @@
   }
   .btn-ghost {
     background: transparent;
-    color: var(--text2);
-    border: 1px solid var(--border2);
+    color: var(--muted);
+    border: 1px solid var(--line);
   }
-  .btn-ghost:hover { background: var(--surface3); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--rose); color: var(--rose); }
   .btn-gold {
-    background: var(--gold);
-    color: #1a1200;
-    font-weight: 600;
+    background: var(--plum);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(75,58,82,.18);
   }
-  .btn-gold:hover { background: var(--gold-light); }
+  .btn-gold:hover { background: var(--rose); transform: translateY(-1px); }
   .btn-accent {
-    background: var(--accent-dim);
-    color: #b0a4ff;
-    border: 1px solid rgba(123,104,238,0.3);
+    background: rgba(201,123,132,0.12);
+    color: #A85C66;
+    border: 1px solid rgba(201,123,132,0.35);
   }
-  .btn-accent:hover { background: rgba(123,104,238,0.25); }
-  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-accent:hover { background: rgba(201,123,132,0.22); }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
   .btn-icon {
     background: transparent;
     border: none;
-    color: var(--text3);
+    color: var(--muted);
     cursor: pointer;
     padding: 6px;
     border-radius: 6px;
@@ -147,7 +153,7 @@
     display: flex;
     align-items: center;
   }
-  .btn-icon:hover { background: var(--surface3); color: var(--text); }
+  .btn-icon:hover { background: var(--line); color: var(--plum); }
   .btn-icon.danger:hover { color: var(--danger); }
 
   /* ── SETUP SCREEN ── */
@@ -159,28 +165,31 @@
     padding: 40px 20px;
   }
   .setup-card {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: 20px;
-    padding: 40px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 44px 40px;
     max-width: 480px;
     width: 100%;
     text-align: center;
+    box-shadow: 0 20px 50px rgba(75,58,82,0.08);
   }
   .setup-hero {
-    font-size: 48px;
-    margin-bottom: 16px;
+    font-size: 46px;
+    margin-bottom: 14px;
   }
   .setup-title {
     font-family: var(--font-display);
-    font-size: 26px;
-    color: var(--gold);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 32px;
+    color: var(--plum);
     margin-bottom: 8px;
   }
   .setup-sub {
     font-size: 14px;
-    color: var(--text2);
-    margin-bottom: 32px;
+    color: var(--muted);
+    margin-bottom: 30px;
     line-height: 1.6;
   }
   .setup-fields {
@@ -191,30 +200,32 @@
   }
   .field-label {
     font-size: 11px;
-    color: var(--text3);
+    color: var(--muted);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     margin-bottom: 6px;
+    font-weight: 600;
   }
   .field-input {
     width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
+    background: var(--paper);
+    border: 1px solid var(--line);
     border-radius: var(--radius-sm);
-    color: var(--text);
+    color: var(--ink);
     font-size: 15px;
     font-family: var(--font-body);
     padding: 11px 14px;
     outline: none;
     transition: border-color 0.15s;
   }
-  .field-input:focus { border-color: var(--gold); }
-  .field-input::placeholder { color: var(--text3); }
+  .field-input:focus { border-color: var(--gold); background: #fff; }
+  .field-input::placeholder { color: var(--muted); opacity: .7; }
   .setup-start {
-    margin-top: 24px;
+    margin-top: 22px;
     width: 100%;
     padding: 14px;
     font-size: 15px;
+    justify-content: center;
   }
 
   /* ── MAIN APP ── */
@@ -223,9 +234,9 @@
 
   /* ── COUPLE BANNER ── */
   .couple-banner {
-    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 20px 24px;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+    padding: 26px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -234,165 +245,152 @@
   }
   .couple-names {
     font-family: var(--font-display);
-    font-size: 22px;
-    color: var(--text);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 30px;
+    color: var(--plum);
+    line-height: 1.1;
   }
-  .couple-names span { color: var(--gold); }
+  .couple-names span { color: var(--rose); font-style: normal; }
   .couple-date {
     font-size: 13px;
-    color: var(--text2);
-    margin-top: 4px;
+    color: var(--muted);
+    margin-top: 6px;
+    text-transform: capitalize;
   }
   .couple-actions {
     display: flex;
-    gap: 8px;
+    gap: 18px;
     flex-wrap: wrap;
   }
+  .couple-actions .link-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 12.5px;
+    font-family: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    padding: 0;
+  }
+  .couple-actions .link-btn:hover { color: var(--rose); }
 
   /* ── TIMELINE ── */
   .timeline-wrap {
-    max-width: 700px;
+    max-width: 720px;
     margin: 0 auto;
-    padding: 24px 16px 100px;
+    padding: 30px 20px 120px;
   }
 
-  .section-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text3);
-    margin: 28px 0 12px 60px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  .tl-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 0;
-    position: relative;
-    margin-bottom: 0;
-  }
-  .tl-time-col {
-    width: 60px;
-    flex-shrink: 0;
-    padding-top: 16px;
-    text-align: right;
-    padding-right: 10px;
-  }
-  .tl-time-display {
-    font-size: 12px;
+  .phase-label {
+    font-family: var(--font-display);
+    font-style: italic;
     font-weight: 600;
-    color: var(--text2);
-    font-variant-numeric: tabular-nums;
-    cursor: pointer;
-    padding: 2px 4px;
-    border-radius: 4px;
-    transition: background 0.15s;
+    font-size: 22px;
+    color: var(--rose);
+    margin: 44px 0 6px 0;
+    padding-left: 2px;
   }
-  .tl-time-display:hover { background: var(--surface3); color: var(--text); }
-  .tl-axis {
-    width: 24px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .tl-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    margin-top: 18px;
-    border: 2px solid transparent;
-    transition: transform 0.15s;
-  }
-  .tl-item:hover .tl-dot { transform: scale(1.3); }
-  .tl-line {
-    width: 2px;
-    flex: 1;
-    min-height: 24px;
-    background: var(--border);
-    margin-top: 2px;
-  }
-  .tl-content {
-    flex: 1;
-    padding: 10px 10px 10px 12px;
-  }
-  .tl-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px 14px;
-    margin-bottom: 8px;
+  .phase-label:first-of-type { margin-top: 6px; }
+
+  .event {
     position: relative;
-    transition: border-color 0.15s, background 0.15s;
-    cursor: default;
+    display: grid;
+    grid-template-columns: 92px 46px 1fr;
+    column-gap: 14px;
+    align-items: start;
+    padding: 14px 4px;
+    border-bottom: 1px dashed var(--line);
+    transition: background .15s;
   }
-  .tl-card:hover { border-color: var(--border2); background: var(--surface2); }
-  .tl-card.highlighted {
-    border-left: 3px solid var(--gold);
-    background: rgba(201,168,76,0.05);
+  .event:last-child { border-bottom: none; }
+  .event:hover { background: rgba(228,217,200,0.18); }
+  .event.highlighted { background: rgba(176,141,87,0.06); }
+  .event.highlighted::before {
+    content:"";
+    position:absolute; left:-2px; top:8px; bottom:8px; width:3px;
+    background: var(--gold); border-radius: 4px;
   }
-  .tl-card-top {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 4px;
+
+  .ev-time-col { padding-top: 4px; cursor: pointer; }
+  .ev-time {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--ink);
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+    border-radius: 5px;
+    padding: 2px 4px;
+    margin-left: -4px;
+    display: inline-block;
+    transition: background .15s;
   }
-  .cat-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+  .ev-time-col:hover .ev-time { background: #F1E6D8; }
+  .ev-duration { font-size: 11px; color: var(--muted); margin-top: 5px; letter-spacing: .01em; }
+
+  .ev-icon-col { display: flex; justify-content: center; padding-top: 2px; }
+  .ev-icon-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--card);
+    border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; cursor: pointer;
+    box-shadow: 0 1px 3px rgba(75,58,82,.08);
+    transition: border-color .15s;
     flex-shrink: 0;
   }
-  .tl-name {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    flex: 1;
-    outline: none;
-    background: transparent;
-    border: none;
-    font-family: var(--font-body);
-    padding: 0;
-    cursor: text;
+  .ev-icon-btn:hover { border-color: var(--rose); }
+
+  .ev-content-col { padding-top: 4px; padding-right: 60px; }
+  .ev-name-row { display: flex; align-items: center; gap: 8px; }
+  .ev-name {
+    font-size: 16.5px; font-weight: 500; color: var(--ink);
+    outline: none; line-height: 1.4; padding: 3px 6px; border-radius: 5px;
+    min-height: 1.4em; flex: 1;
   }
-  .tl-name:focus { color: var(--text); }
-  .tl-card-meta {
-    font-size: 12px;
-    color: var(--text3);
-    display: flex;
-    gap: 12px;
+  .ev-name:hover { background: #F4EEE3; }
+  .ev-name:focus { background: #F1E6D8; }
+  .ev-star { color: var(--gold); font-size: 14px; flex-shrink: 0; }
+
+  .ev-meta {
+    font-size: 12px; color: var(--muted);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-top: 3px; padding: 0 6px;
   }
+  .ev-notes { font-style: italic; color: var(--muted); }
+
   .cat-badge {
     font-size: 10px;
-    padding: 2px 8px;
+    padding: 2px 9px;
     border-radius: 20px;
-    font-weight: 500;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
-  .tl-card-actions {
+  .b-prep   { background: rgba(124,139,111,0.15); color: #5b6b4f; }
+  .b-glam   { background: rgba(201,123,132,0.15); color: #a85c66; }
+  .b-foto   { background: rgba(176,141,87,0.15);  color: #8f7040; }
+  .b-evento { background: rgba(75,58,82,0.13);    color: #4b3a52; }
+  .b-fiesta { background: rgba(138,106,154,0.15); color: #6f4f7e; }
+  .b-other  { background: rgba(139,128,120,0.15); color: #6b625b; }
+
+  .event-actions {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    display: none;
-    gap: 4px;
+    top: 14px;
+    right: 4px;
+    display: flex;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity .15s;
   }
-  .tl-card:hover .tl-card-actions { display: flex; }
+  .event:hover .event-actions { opacity: 1; }
   .drag-handle {
     cursor: grab;
-    color: var(--text3);
-    padding: 4px;
-    font-size: 14px;
+    color: var(--line);
+    padding: 6px;
+    font-size: 15px;
   }
   .drag-handle:active { cursor: grabbing; }
 
@@ -400,32 +398,30 @@
   .add-btn-wrap {
     display: flex;
     justify-content: center;
-    margin: 16px 0 8px;
+    margin: 34px 0 8px;
   }
   .btn-add {
-    background: var(--surface2);
-    border: 1px dashed var(--border2);
-    color: var(--text2);
-    border-radius: var(--radius);
-    padding: 10px 24px;
+    background: var(--plum);
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 30px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 13.5px;
+    letter-spacing: .02em;
     font-family: var(--font-body);
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    max-width: 400px;
-    justify-content: center;
+    font-weight: 600;
+    box-shadow: 0 6px 18px rgba(75,58,82,.22);
+    transition: .15s;
+    display: flex; align-items: center; gap: 8px;
   }
-  .btn-add:hover { background: var(--surface3); color: var(--text); border-color: var(--gold); }
+  .btn-add:hover { background: var(--rose); transform: translateY(-1px); }
 
   /* ── MODAL ── */
   .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.7);
+    background: rgba(46,36,48,0.45);
     display: none;
     align-items: center;
     justify-content: center;
@@ -435,19 +431,22 @@
   }
   .modal-overlay.open { display: flex; }
   .modal {
-    background: var(--surface);
-    border: 1px solid var(--border2);
+    background: var(--card);
+    border: 1px solid var(--line);
     border-radius: 20px;
     padding: 28px;
     width: 100%;
     max-width: 440px;
     max-height: 90vh;
     overflow-y: auto;
+    box-shadow: 0 24px 60px rgba(75,58,82,0.22);
   }
   .modal-title {
     font-family: var(--font-display);
-    font-size: 18px;
-    color: var(--gold);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 21px;
+    color: var(--plum);
     margin-bottom: 20px;
   }
   .modal-fields {
@@ -469,7 +468,7 @@
   select.field-input {
     cursor: pointer;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238a8a9a' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238B8078' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 32px;
@@ -479,19 +478,19 @@
   .empty-state {
     text-align: center;
     padding: 60px 20px;
-    color: var(--text3);
+    color: var(--muted);
   }
-  .empty-state-icon { font-size: 48px; margin-bottom: 16px; }
-  .empty-state h3 { font-size: 16px; color: var(--text2); margin-bottom: 8px; }
+  .empty-state-icon { font-size: 44px; margin-bottom: 16px; opacity: .8; }
+  .empty-state h3 { font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: 20px; color: var(--plum); margin-bottom: 8px; }
   .empty-state p { font-size: 13px; }
 
-  /* ── TIME PICKER ── */
+  /* ── TIME PICKER (modal) ── */
   .time-input-wrap {
     display: flex;
     align-items: center;
     gap: 4px;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
+    background: var(--paper);
+    border: 1px solid var(--line);
     border-radius: var(--radius-sm);
     padding: 8px 12px;
   }
@@ -500,30 +499,15 @@
     width: 36px;
     background: transparent;
     border: none;
-    color: var(--text);
-    font-size: 20px;
-    font-family: var(--font-body);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 21px;
     font-weight: 600;
     text-align: center;
     outline: none;
     font-variant-numeric: tabular-nums;
   }
-  .time-sep { color: var(--text2); font-size: 18px; font-weight: 600; }
-
-  /* ── CAT COLORS ── */
-  .c-prep  { background: var(--cat-prep); }
-  .c-glam  { background: var(--cat-glam); }
-  .c-foto  { background: var(--cat-foto); }
-  .c-evento{ background: var(--cat-evento); }
-  .c-fiesta{ background: var(--cat-fiesta); }
-  .c-other { background: var(--cat-other); }
-
-  .b-prep   { background: rgba(91,155,213,0.15); color: #7fb8e8; }
-  .b-glam   { background: rgba(196,125,184,0.15); color: #d9a8cf; }
-  .b-foto   { background: rgba(91,186,143,0.15); color: #7fd4ad; }
-  .b-evento { background: rgba(232,162,60,0.15);  color: #f0bc60; }
-  .b-fiesta { background: rgba(123,104,238,0.15); color: #b0a4ff; }
-  .b-other  { background: rgba(138,138,154,0.15); color: #b0b0c0; }
+  .time-sep { color: var(--muted); font-size: 18px; font-weight: 600; }
 
   /* ── TOAST ── */
   .toast {
@@ -531,39 +515,45 @@
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%) translateY(20px);
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    color: var(--text);
-    border-radius: var(--radius);
-    padding: 12px 20px;
+    background: var(--plum);
+    border: 1px solid var(--plum);
+    color: #fff;
+    border-radius: 30px;
+    padding: 12px 22px;
     font-size: 13px;
+    font-weight: 500;
     z-index: 300;
     opacity: 0;
     transition: all 0.25s;
     pointer-events: none;
     white-space: nowrap;
+    box-shadow: 0 10px 30px rgba(75,58,82,.25);
   }
   .toast.show {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
   }
-  .toast.gold { border-color: var(--gold); color: var(--gold-light); }
+  .toast.gold { background: var(--gold); border-color: var(--gold); }
 
   /* ── SORTABLE ── */
-  .sortable-ghost { opacity: 0.4; }
+  .sortable-ghost { opacity: 0.35; }
   .sortable-drag { opacity: 1 !important; }
 
   /* ── RESPONSIVE ── */
   @media (max-width: 480px) {
     .header { padding: 12px 16px; }
     .btn { padding: 7px 12px; font-size: 12px; }
-    .couple-banner { padding: 16px; }
-    .couple-names { font-size: 18px; }
-    .timeline-wrap { padding: 16px 12px 80px; }
-    .setup-card { padding: 28px 20px; }
-    .brand-name { font-size: 12px; }
+    .couple-banner { padding: 18px 16px; }
+    .couple-names { font-size: 24px; }
+    .timeline-wrap { padding: 20px 12px 100px; }
+    .setup-card { padding: 30px 22px; }
+    .brand-name { font-size: 13px; }
     .modal { padding: 20px; }
     .modal-row { grid-template-columns: 1fr; }
+    .event { grid-template-columns: 74px 40px 1fr; column-gap: 10px; }
+    .ev-time { font-size: 18px; }
+    .ev-icon-btn { width: 34px; height: 34px; font-size: 15px; }
+    .ev-content-col { padding-right: 46px; }
   }
 
   /* ── SETUP TABS ── */
@@ -571,37 +561,39 @@
     display: flex;
     gap: 0;
     margin-bottom: 24px;
-    background: var(--surface2);
-    border-radius: var(--radius-sm);
-    padding: 3px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 30px;
+    padding: 4px;
   }
   .setup-tab {
     flex: 1;
     padding: 9px 12px;
     background: transparent;
     border: none;
-    border-radius: 6px;
-    color: var(--text3);
+    border-radius: 26px;
+    color: var(--muted);
     font-size: 13px;
     font-family: var(--font-body);
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.15s;
   }
   .setup-tab.active {
-    background: var(--surface3);
-    color: var(--text);
-    font-weight: 500;
+    background: var(--plum);
+    color: #fff;
+    font-weight: 600;
   }
 
   /* ── ACCESS CODE DISPLAY ── */
   .access-code-display {
     font-family: 'Courier New', monospace;
-    font-size: 36px;
+    font-size: 34px;
     font-weight: 700;
     letter-spacing: 0.15em;
-    color: var(--gold);
-    background: var(--surface2);
-    border: 2px solid var(--gold-dim);
+    color: var(--plum);
+    background: var(--paper);
+    border: 2px solid var(--gold);
     border-radius: var(--radius);
     padding: 16px;
     margin: 0 auto 8px;
@@ -613,33 +605,32 @@
     letter-spacing: 0.12em;
     text-align: center;
     font-weight: 700;
-    color: var(--gold);
+    color: var(--plum);
   }
 
   /* ── SYNC BADGE ── */
   .sync-badge {
-    font-size: 11px;
+    font-size: 12px;
     padding: 3px 8px;
     border-radius: 20px;
-    font-weight: 600;
+    font-weight: 700;
     display: flex;
     align-items: center;
     gap: 4px;
     cursor: default;
     transition: all 0.3s;
   }
-  .sync-badge.synced  { color: #5bba8f; }
+  .sync-badge.synced  { color: var(--sage); }
   .sync-badge.syncing { color: var(--gold); }
   .sync-badge.error   { color: var(--danger); }
 
   /* ── PRINT / PDF ── */
   @media print {
-    .header, .couple-actions, .tl-card-actions, .add-btn-wrap,
-    .btn-add, .section-label::after { display: none !important; }
-    body { background: white; color: black; }
-    .tl-card { border-color: #ddd; background: white; }
-    .couple-names { color: #222; }
-    .couple-names span { color: #8B6914; }
+    .header, .couple-actions, .event-actions, .add-btn-wrap,
+    .btn-add { display: none !important; }
+    body { background: #fff; }
+    .event:hover { background: none; }
+    .couple-names { color: var(--plum); }
   }
 </style>
 </head>
@@ -663,7 +654,7 @@
       <div class="setup-fields">
         <div>
           <div class="field-label">Nombre(s) de los novios</div>
-          <input class="field-input" id="setup-names" type="text" placeholder="Ej: María & Carlos" maxlength="60">
+          <input class="field-input" id="setup-names" type="text" placeholder="Ej: María &amp; Carlos" maxlength="60">
         </div>
         <div>
           <div class="field-label">Fecha de la boda</div>
@@ -686,13 +677,13 @@
           <input class="field-input code-input" id="setup-code" type="text"
             placeholder="Ej: ABC-7X2" maxlength="10"
             oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9\-]/g,'')">
-          <p style="margin-top:8px;font-size:12px;color:var(--text3);">El código te lo dio quien creó el programa.</p>
+          <p style="margin-top:8px;font-size:12px;color:var(--muted);">El código te lo dio quien creó el programa.</p>
         </div>
       </div>
       <button class="btn btn-gold setup-start" id="btn-join" onclick="joinBin()">Acceder →</button>
     </div>
 
-    <p style="margin-top:20px;font-size:11px;color:var(--text3);">✦ Elaborado por <strong style="color:var(--gold)">@senenphotography</strong></p>
+    <p style="margin-top:20px;font-size:11px;color:var(--muted);">✦ Elaborado por <strong style="color:var(--gold)">@senenphotography</strong></p>
   </div>
 </div>
 
@@ -700,8 +691,8 @@
 <div class="modal-overlay" id="code-modal">
   <div class="modal" style="text-align:center;max-width:380px">
     <div style="font-size:40px;margin-bottom:12px">🎉</div>
-    <div class="modal-title" style="font-size:22px">¡Programa creado!</div>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6">
+    <div class="modal-title" style="font-size:24px">¡Programa creado!</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">
       Guarda este código. Cualquier persona con él puede ver y editar tu programa desde cualquier dispositivo.
     </p>
     <div class="access-code-display" id="access-code-display">---</div>
@@ -711,7 +702,7 @@
     <button class="btn btn-gold" style="width:100%;margin-top:10px;justify-content:center" onclick="dismissCodeModal()">
       Continuar →
     </button>
-    <p style="margin-top:14px;font-size:11px;color:var(--text3)">
+    <p style="margin-top:14px;font-size:11px;color:var(--muted)">
       También puedes compartir el link directo desde el menú ⋯
     </p>
   </div>
@@ -740,13 +731,13 @@
   <!-- COUPLE BANNER -->
   <div class="couple-banner">
     <div>
-      <div class="couple-names" id="couple-names-display">— & —</div>
+      <div class="couple-names" id="couple-names-display">— &amp; —</div>
       <div class="couple-date" id="couple-date-display"></div>
-      <div class="couple-date" id="couple-venue-display" style="color:var(--text3);font-size:12px;margin-top:2px;"></div>
+      <div class="couple-date" id="couple-venue-display" style="color:var(--muted);font-size:12px;margin-top:2px;"></div>
     </div>
     <div class="couple-actions">
-      <button class="btn btn-ghost btn-sm" onclick="resetApp()">✎ Editar info</button>
-      <button class="btn btn-ghost btn-sm" onclick="clearAll()">⊘ Limpiar todo</button>
+      <button class="link-btn" onclick="resetApp()">✎ Editar info</button>
+      <button class="link-btn" onclick="clearAll()">⊘ Limpiar todo</button>
     </div>
   </div>
 
@@ -755,7 +746,7 @@
     <div id="timeline-list"></div>
     <div class="add-btn-wrap">
       <button class="btn-add" onclick="openAddModal()">
-        <span style="font-size:18px;line-height:1">+</span> Añadir evento
+        <span style="font-size:16px;line-height:1">+</span> Añadir evento
       </button>
     </div>
   </div>
@@ -766,7 +757,7 @@
 <div class="modal-overlay" id="share-modal">
   <div class="modal" style="text-align:center;max-width:380px">
     <div class="modal-title">🔗 Compartir programa</div>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6">
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">
       Usa este código para acceder desde cualquier dispositivo o compártelo con tu equipo.
     </p>
     <div class="access-code-display" id="share-code-display">---</div>
@@ -822,7 +813,7 @@
       </div>
       <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:4px 0">
         <input type="checkbox" id="ev-highlight" style="width:16px;height:16px;accent-color:var(--gold)">
-        <span style="font-size:13px;color:var(--text2)">⭐ Destacar este evento</span>
+        <span style="font-size:13px;color:var(--muted)">⭐ Destacar este evento</span>
       </label>
     </div>
     <div class="modal-footer">
@@ -854,12 +845,16 @@ let pollingInterval = null;
 let lastRemoteHash = null;
 
 const CAT_COLORS = {
-  prep: '#5b9bd5', glam: '#c47db8', foto: '#5bba8f',
-  evento: '#e8a23c', fiesta: '#7b68ee', other: '#8a8a9a'
+  prep: '#7C8B6F', glam: '#C97B84', foto: '#B08D57',
+  evento: '#4B3A52', fiesta: '#8A6A9A', other: '#8B8078'
 };
 const CAT_LABELS = {
   prep: 'Preparación', glam: 'Belleza', foto: 'Fotografía',
   evento: 'Ceremonia', fiesta: 'Fiesta', other: 'Otro'
+};
+const CAT_ICONS = {
+  prep: '🏠', glam: '💄', foto: '📷',
+  evento: '💒', fiesta: '🎉', other: '📌'
 };
 
 // ── PROGRAMA BASE (precargado en cada boda nueva) ──────
@@ -967,12 +962,6 @@ async function updateBinRemote(binId, data) {
   });
   if (!res.ok) throw new Error('Error al guardar: ' + res.status);
 }
-
-// We store the binId → code mapping in a "directory" bin.
-// For simplicity, we embed the binId into the code itself (no extra bin needed).
-// The code IS the last 6 chars of the binId, formatted.
-// Reverse: given code "A3F-9B2", we need the full binId.
-// Solution: store binId in localStorage on create, and also embed in URL hash.
 
 function getBinIdFromCode(code) {
   // Try localStorage directory first
@@ -1094,16 +1083,9 @@ async function joinBin() {
   btn.disabled = true;
   btn.textContent = 'Buscando...';
 
-  // Try to find binId from local directory or URL
   let binId = getBinIdFromCode(code);
 
-  // If not found locally, try reading from URL hash hint or ask
   if (!binId) {
-    // Code format: last 6 chars of binId (without dashes)
-    // We can't reverse-engineer the full binId from just 6 chars.
-    // So we list all bins and search. But JSONBin free tier doesn't support listing.
-    // Instead: we embed the full binId in the URL as ?b=BINID#CODE
-    // Check URL params
     const params = new URLSearchParams(window.location.search);
     const urlBinId = params.get('b');
     if (urlBinId) {
@@ -1167,13 +1149,11 @@ function copyLink() {
 
 // ── INIT ───────────────────────────────────────────────
 (async function init() {
-  // Check URL for direct link: ?b=BINID#CODE
   const params = new URLSearchParams(window.location.search);
   const urlBinId = params.get('b');
   const urlCode  = window.location.hash.replace('#','').toUpperCase();
 
   if (urlBinId && urlCode) {
-    // Direct link — auto-join
     saveBinIdForCode(urlCode, urlBinId);
     currentBinId = urlBinId;
     currentCode  = urlCode;
@@ -1189,10 +1169,8 @@ function copyLink() {
     } catch(e) { /* fall through to setup */ }
   }
 
-  // Try to restore from localStorage
   const restored = loadLocal();
   if (restored && currentBinId && state.couple.names) {
-    // Refresh from cloud
     try {
       const remote = await readBinRemote(currentBinId);
       state = remote.state || state;
@@ -1204,7 +1182,6 @@ function copyLink() {
     return;
   }
 
-  // Fresh setup
   document.getElementById('setup-date').valueAsDate = new Date();
 })();
 
@@ -1224,7 +1201,6 @@ function resetApp() {
   document.getElementById('setup-date').value = state.couple.date;
   document.getElementById('setup-venue').value = state.couple.venue;
 
-  // Si ya existe una boda (currentBinId), estamos EDITANDO info, no creando otra.
   const btn = document.getElementById('btn-create');
   const cancelBtn = document.getElementById('btn-cancel-edit');
   if (currentBinId) {
@@ -1324,7 +1300,7 @@ function renderTimeline() {
       <div class="empty-state">
         <div class="empty-state-icon">📋</div>
         <h3>No hay eventos aún</h3>
-        <p>Añade el primer evento de tu gran día</p>
+        <p>Añade el primero de tu gran día</p>
       </div>`;
     return;
   }
@@ -1336,42 +1312,38 @@ function renderTimeline() {
     const section = getSectionLabel(ev.hour);
     if (section !== lastSection) {
       lastSection = section;
-      html += `<div class="section-label">${section}</div>`;
+      html += `<div class="phase-label">${section}</div>`;
     }
     const color = CAT_COLORS[ev.cat] || CAT_COLORS.other;
+    const icon = CAT_ICONS[ev.cat] || CAT_ICONS.other;
     const badgeClass = 'b-' + ev.cat;
     const catLabel = CAT_LABELS[ev.cat] || 'Otro';
     const highlighted = ev.highlight ? 'highlighted' : '';
-    const isLast = i === state.events.length - 1;
 
     html += `
-    <div class="tl-item" data-id="${ev.id}">
-      <div class="tl-time-col">
-        <span class="tl-time-display" onclick="quickEditTime('${ev.id}')">${fmtTime(ev.hour, ev.minute)}</span>
+    <div class="event ${highlighted}" data-id="${ev.id}">
+      <div class="ev-time-col" onclick="quickEditTime('${ev.id}')">
+        <div class="ev-time">${fmtTime(ev.hour, ev.minute)}</div>
+        <div class="ev-duration">${fmtDur(ev.duration)}</div>
       </div>
-      <div class="tl-axis">
-        <div class="tl-dot" style="background:${color};border-color:${color}"></div>
-        ${!isLast ? '<div class="tl-line"></div>' : ''}
+      <div class="ev-icon-col">
+        <button class="ev-icon-btn" type="button" style="border-color:${color}66" onclick="openEditModal('${ev.id}')" title="${catLabel}">${icon}</button>
       </div>
-      <div class="tl-content">
-        <div class="tl-card ${highlighted}">
-          <div class="tl-card-top">
-            <div class="cat-dot ${color ? '' : 'c-other'}" style="background:${color}"></div>
-            <div class="tl-name" contenteditable="true" onblur="updateName('${ev.id}',this)"
-              spellcheck="false">${escHtml(ev.name)}</div>
-          </div>
-          <div class="tl-card-meta">
-            <span class="cat-badge ${badgeClass}">${catLabel}</span>
-            <span>${fmtDur(ev.duration)}</span>
-            ${ev.notes ? `<span style="color:var(--text3);font-style:italic">${escHtml(ev.notes)}</span>` : ''}
-            ${ev.highlight ? '<span style="color:var(--gold)">⭐</span>' : ''}
-          </div>
-          <div class="tl-card-actions">
-            <span class="drag-handle" title="Arrastrar">⠿</span>
-            <button class="btn-icon" onclick="openEditModal('${ev.id}')" title="Editar">✎</button>
-            <button class="btn-icon danger" onclick="deleteEvent('${ev.id}')" title="Eliminar">✕</button>
-          </div>
+      <div class="ev-content-col">
+        <div class="ev-name-row">
+          <div class="ev-name" contenteditable="true" onblur="updateName('${ev.id}',this)"
+            spellcheck="false">${escHtml(ev.name)}</div>
+          ${ev.highlight ? '<span class="ev-star">⭐</span>' : ''}
         </div>
+        <div class="ev-meta">
+          <span class="cat-badge ${badgeClass}">${catLabel}</span>
+          ${ev.notes ? `<span class="ev-notes">${escHtml(ev.notes)}</span>` : ''}
+        </div>
+      </div>
+      <div class="event-actions">
+        <span class="drag-handle" title="Arrastrar">⠿</span>
+        <button class="btn-icon" onclick="openEditModal('${ev.id}')" title="Editar">✎</button>
+        <button class="btn-icon danger" onclick="deleteEvent('${ev.id}')" title="Eliminar">✕</button>
       </div>
     </div>`;
   });
@@ -1483,47 +1455,47 @@ function exportPDF() {
   const W = 210, H = 297;
 
   // Background
-  doc.setFillColor(15, 15, 26);
+  doc.setFillColor(251, 246, 239);
   doc.rect(0, 0, W, H, 'F');
 
   // Gold header bar
-  doc.setFillColor(201, 168, 76);
+  doc.setFillColor(176, 141, 87);
   doc.rect(0, 0, W, 18, 'F');
 
   // Header text
-  doc.setTextColor(26, 18, 0);
+  doc.setTextColor(255, 255, 255);
   doc.setFontSize(9);
   doc.text('@senenphotography', 10, 11);
   doc.setFontSize(9);
   doc.text('Programa del evento', W - 10, 11, { align: 'right' });
 
   // Couple names
-  doc.setTextColor(255, 245, 220);
+  doc.setTextColor(75, 58, 82);
   doc.setFontSize(22);
   doc.text(state.couple.names || 'Los Novios', W/2, 36, { align: 'center' });
 
   if (state.couple.date) {
     const d = new Date(state.couple.date + 'T00:00:00');
     doc.setFontSize(10);
-    doc.setTextColor(168, 164, 160);
+    doc.setTextColor(139, 128, 120);
     doc.text(d.toLocaleDateString('es-CO', { weekday:'long', year:'numeric', month:'long', day:'numeric' }), W/2, 44, { align: 'center' });
   }
 
   if (state.couple.venue) {
     doc.setFontSize(9);
-    doc.setTextColor(107, 104, 112);
+    doc.setTextColor(139, 128, 120);
     doc.text(state.couple.venue, W/2, 51, { align: 'center' });
   }
 
   // Divider
-  doc.setDrawColor(201, 168, 76);
+  doc.setDrawColor(176, 141, 87);
   doc.setLineWidth(0.3);
   doc.line(20, 55, W - 20, 55);
 
   // Events
   const CAT_RGB = {
-    prep: [91,155,213], glam: [196,125,184], foto: [91,186,143],
-    evento: [232,162,60], fiesta: [123,104,238], other: [138,138,154]
+    prep: [124,139,111], glam: [201,123,132], foto: [176,141,87],
+    evento: [75,58,82], fiesta: [138,106,154], other: [139,128,120]
   };
 
   let y = 63;
@@ -1535,9 +1507,9 @@ function exportPDF() {
       lastSec = sec;
       if (y > 63) y += 4;
       doc.setFontSize(7);
-      doc.setTextColor(107, 104, 112);
+      doc.setTextColor(201, 123, 132);
       doc.text(sec.toUpperCase(), 20, y);
-      doc.setDrawColor(50, 50, 70);
+      doc.setDrawColor(228, 217, 200);
       doc.setLineWidth(0.2);
       doc.line(55, y - 1, W - 20, y - 1);
       y += 7;
@@ -1545,7 +1517,7 @@ function exportPDF() {
 
     if (y > H - 30) {
       doc.addPage();
-      doc.setFillColor(15, 15, 26);
+      doc.setFillColor(251, 246, 239);
       doc.rect(0, 0, W, H, 'F');
       y = 20;
     }
@@ -1558,28 +1530,28 @@ function exportPDF() {
 
     // Time
     doc.setFontSize(8);
-    doc.setTextColor(168, 164, 160);
+    doc.setTextColor(46, 36, 48);
     doc.text(fmtTime(ev.hour, ev.minute), 28, y);
 
     // Name
     doc.setFontSize(10);
     if (ev.highlight) {
-      doc.setTextColor(201, 168, 76);
+      doc.setTextColor(176, 141, 87);
     } else {
-      doc.setTextColor(240, 236, 227);
+      doc.setTextColor(46, 36, 48);
     }
     doc.text(ev.name, 52, y);
 
     // Duration
     doc.setFontSize(8);
-    doc.setTextColor(107, 104, 112);
+    doc.setTextColor(139, 128, 120);
     doc.text(fmtDur(ev.duration), W - 20, y, { align: 'right' });
 
     // Notes
     if (ev.notes) {
       y += 5;
       doc.setFontSize(7);
-      doc.setTextColor(107, 104, 112);
+      doc.setTextColor(139, 128, 120);
       doc.setFont(undefined, 'italic');
       doc.text(ev.notes, 52, y);
       doc.setFont(undefined, 'normal');
@@ -1587,7 +1559,7 @@ function exportPDF() {
 
     // Connector line
     if (i < state.events.length - 1) {
-      doc.setDrawColor(40, 40, 60);
+      doc.setDrawColor(228, 217, 200);
       doc.setLineWidth(0.3);
       doc.line(22, y + 2, 22, y + 8);
     }
@@ -1596,10 +1568,10 @@ function exportPDF() {
   });
 
   // Footer
-  doc.setFillColor(201, 168, 76);
+  doc.setFillColor(176, 141, 87);
   doc.rect(0, H - 10, W, 10, 'F');
   doc.setFontSize(7);
-  doc.setTextColor(26, 18, 0);
+  doc.setTextColor(255, 255, 255);
   doc.text('Creado con amor por @senenphotography · Fotografía de bodas en Colombia', W/2, H - 4, { align: 'center' });
 
   const fname = `programa-boda-${(state.couple.names || 'novios').replace(/[^a-z0-9]/gi,'_').toLowerCase()}.pdf`;
@@ -1635,8 +1607,8 @@ const manifest = {
   description: "Organizador de timeline de boda por @senenphotography",
   start_url: "./",
   display: "standalone",
-  background_color: "#0f0f1a",
-  theme_color: "#1a1a2e",
+  background_color: "#FBF6EF",
+  theme_color: "#FBF6EF",
   icons: [{ src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💍</text></svg>", sizes: "any", type: "image/svg+xml" }]
 };
 const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
