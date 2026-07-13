@@ -9,6 +9,8 @@
 <meta name="apple-mobile-web-app-title" content="Mi Boda">
 <title>Programa del Día — @senenphotography</title>
 <link rel="manifest" href="#" id="manifest-placeholder">
+<link rel="apple-touch-icon" id="apple-icon-placeholder">
+<link rel="icon" id="icon-placeholder">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -218,10 +220,14 @@
   }
   .btn-icon:hover { background: var(--line); color: var(--plum); }
   .btn-icon.danger:hover { color: var(--danger); }
+  @media (hover: none) {
+    .btn-icon { padding: 9px; }
+  }
 
   /* ── SETUP SCREEN ── */
   .setup-screen {
     min-height: calc(100vh - 60px);
+    min-height: calc(100dvh - 60px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -275,7 +281,7 @@
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
     color: var(--ink);
-    font-size: 15px;
+    font-size: 16px;
     font-family: var(--font-body);
     padding: 11px 14px;
     outline: none;
@@ -449,11 +455,16 @@
     transition: opacity .15s;
   }
   .event:hover .event-actions { opacity: 1; }
+  /* En pantallas táctiles no existe :hover, así que mostramos los
+     botones de arrastrar/editar/borrar siempre (más tenues) */
+  @media (hover: none) {
+    .event-actions { opacity: .55; }
+  }
   .drag-handle {
     cursor: grab;
     color: var(--line);
-    padding: 6px;
-    font-size: 15px;
+    padding: 8px 6px;
+    font-size: 16px;
   }
   .drag-handle:active { cursor: grabbing; }
 
@@ -984,16 +995,16 @@
       <div>
         <div class="field-label">Hora de inicio</div>
         <div class="time-input-wrap">
-          <input class="time-part" id="ev-hours" type="number" min="0" max="23" placeholder="HH" value="08">
+          <input class="time-part" id="ev-hours" type="number" inputmode="numeric" min="0" max="23" placeholder="HH" value="08">
           <span class="time-sep">:</span>
-          <input class="time-part" id="ev-minutes" type="number" min="0" max="59" placeholder="MM" value="00">
+          <input class="time-part" id="ev-minutes" type="number" inputmode="numeric" min="0" max="59" placeholder="MM" value="00">
         </div>
         <button type="button" class="nextday-chip" id="ev-nextday-chip" onclick="toggleNextDay()">+ Es de madrugada del día siguiente</button>
       </div>
       <div class="modal-row">
         <div>
           <div class="field-label">Duración (minutos)</div>
-          <input class="field-input" id="ev-duration" type="number" min="5" max="480" step="5" placeholder="30" value="30">
+          <input class="field-input" id="ev-duration" type="number" inputmode="numeric" min="5" max="480" step="5" placeholder="30" value="30">
         </div>
         <div>
           <div class="field-label">Categoría</div>
@@ -1212,6 +1223,7 @@ function startPolling() {
   if (pollingInterval) clearInterval(pollingInterval);
   pollingInterval = setInterval(async () => {
     if (!currentBinId) return;
+    if (document.hidden) return; // pausa si el celular está en segundo plano
     try {
       const remote = await readBinRemote(currentBinId);
       const hash = JSON.stringify(remote.state);
@@ -1227,6 +1239,24 @@ function startPolling() {
     } catch(e) { /* silent */ }
   }, 15000);
 }
+
+// Al volver del segundo plano (cambiar de app, bloquear pantalla, etc.)
+// forzamos una sincronización inmediata en vez de esperar el próximo tick.
+document.addEventListener('visibilitychange', async () => {
+  if (document.hidden || !currentBinId) return;
+  try {
+    const remote = await readBinRemote(currentBinId);
+    const hash = JSON.stringify(remote.state);
+    if (lastRemoteHash && hash !== lastRemoteHash) {
+      state = remote.state;
+      saveLocal();
+      updateBanner();
+      renderTimeline();
+      showToast('Sincronizado con cambios externos ↻');
+    }
+    lastRemoteHash = hash;
+  } catch(e) { /* silent */ }
+});
 
 // ── TAB SWITCH ─────────────────────────────────────────
 function switchTab(tab) {
@@ -1621,9 +1651,9 @@ function closeModal() {
 function saveEvent() {
   const name = document.getElementById('ev-name').value.trim();
   if (!name) { showToast('El nombre no puede estar vacío'); return; }
-  const hour = parseInt(document.getElementById('ev-hours').value) || 0;
-  const minute = parseInt(document.getElementById('ev-minutes').value) || 0;
-  const duration = parseInt(document.getElementById('ev-duration').value) || 30;
+  const hour = Math.max(0, Math.min(23, parseInt(document.getElementById('ev-hours').value) || 0));
+  const minute = Math.max(0, Math.min(59, parseInt(document.getElementById('ev-minutes').value) || 0));
+  const duration = Math.max(5, parseInt(document.getElementById('ev-duration').value) || 30);
   const cat = document.getElementById('ev-category').value;
   const notes = document.getElementById('ev-notes').value.trim();
   const highlight = document.getElementById('ev-highlight').checked;
@@ -1822,12 +1852,41 @@ document.getElementById('modal').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeModal();
 });
 
-// Fix time input formatting
-['ev-hours','ev-minutes'].forEach(id => {
-  document.getElementById(id).addEventListener('blur', function() {
-    this.value = String(parseInt(this.value)||0).padStart(2,'0');
-  });
+// Fix time input formatting (y evita valores fuera de rango, ej. 99:99)
+document.getElementById('ev-hours').addEventListener('blur', function() {
+  let v = Math.max(0, Math.min(23, parseInt(this.value) || 0));
+  this.value = String(v).padStart(2,'0');
 });
+document.getElementById('ev-minutes').addEventListener('blur', function() {
+  let v = Math.max(0, Math.min(59, parseInt(this.value) || 0));
+  this.value = String(v).padStart(2,'0');
+});
+
+// ── ÍCONO DE LA APP (generado con canvas, para pantalla de inicio) ──
+function generateAppIcon(size) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  // Fondo color papel
+  ctx.fillStyle = '#FBF6EF';
+  ctx.fillRect(0, 0, size, size);
+  // Anillo dorado
+  ctx.strokeStyle = '#B08D57';
+  ctx.lineWidth = size * 0.045;
+  ctx.beginPath();
+  ctx.arc(size/2, size/2, size * 0.44, 0, Math.PI * 2);
+  ctx.stroke();
+  // Símbolo central
+  ctx.font = `${Math.round(size * 0.5)}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('💍', size/2, size/2 + size * 0.04);
+  return canvas.toDataURL('image/png');
+}
+const iconLarge = generateAppIcon(192);
+const iconSmall = generateAppIcon(96);
+document.getElementById('apple-icon-placeholder').setAttribute('href', iconLarge);
+document.getElementById('icon-placeholder').setAttribute('href', iconSmall);
 
 // PWA install manifest inline
 const manifest = {
@@ -1838,7 +1897,10 @@ const manifest = {
   display: "standalone",
   background_color: "#FBF6EF",
   theme_color: "#FBF6EF",
-  icons: [{ src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💍</text></svg>", sizes: "any", type: "image/svg+xml" }]
+  icons: [
+    { src: iconSmall, sizes: "96x96", type: "image/png" },
+    { src: iconLarge, sizes: "192x192", type: "image/png" }
+  ]
 };
 const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
 document.getElementById('manifest-placeholder').href = URL.createObjectURL(blob);
