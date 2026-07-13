@@ -58,6 +58,69 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* ── SOCIAL / BRAND ── */
+  .social-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 1px solid var(--line);
+    color: var(--plum);
+    transition: all 0.15s;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  .social-btn svg { width: 16px; height: 16px; display: block; }
+  .social-btn:hover {
+    border-color: var(--rose);
+    color: var(--rose);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(201,123,132,.18);
+  }
+  .social-btn.sm { width: 30px; height: 30px; }
+  .social-btn.sm svg { width: 14px; height: 14px; }
+
+  .site-footer {
+    background: var(--card);
+    border-top: 1px solid var(--line);
+    padding: 30px 24px 38px;
+    text-align: center;
+  }
+  .site-footer .footer-brand {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 19px;
+    color: var(--plum);
+    margin-bottom: 4px;
+  }
+  .site-footer .footer-tag {
+    font-size: 11.5px;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+    margin-bottom: 16px;
+  }
+  .site-footer .social-bar { margin-bottom: 14px; }
+  .site-footer .footer-cta {
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .site-footer .footer-cta a {
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .site-footer .footer-cta a:hover { color: var(--rose); }
+
   /* ── HEADER ── */
   .header {
     background: rgba(251,246,239,0.92);
@@ -719,7 +782,17 @@
       <button class="btn btn-gold setup-start" id="btn-join" onclick="joinBin()">Acceder →</button>
     </div>
 
-    <p style="margin-top:20px;font-size:11px;color:var(--muted);">✦ Elaborado por <strong style="color:var(--gold)">@senenphotography</strong></p>
+    <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--line);">
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">✦ Elaborado por <strong style="color:var(--gold)">@senenphotography</strong></p>
+      <div class="social-bar">
+        <a class="social-btn sm" href="https://www.instagram.com/senenphotography/" target="_blank" rel="noopener" title="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a class="social-btn sm" href="https://wa.me/573045683139" target="_blank" rel="noopener" title="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.2-.6.9-.8 1.1-.1.2-.3.2-.5.1-1.4-.7-2.4-1.3-3.3-2.9-.1-.2 0-.4.1-.5.2-.2.4-.5.6-.7.1-.2.1-.4 0-.6-.1-.2-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4-.2 0-.4 0-.6 0-.2 0-.5.1-.7.4-.2.3-.9 1-.9 2.3 0 1.4 1 2.7 1.1 2.9.1.2 1.9 3 4.6 4.1 2.3.9 2.7.7 3.2.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.1.2-1.2-.1-.1-.3-.1-.6-.2zM12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C4 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg>
+        </a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -749,14 +822,20 @@
 
   <!-- HEADER -->
   <div class="header">
-    <div class="brand">
+    <a class="brand" href="https://www.instagram.com/senenphotography/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;" title="Ver Instagram">
       <div class="brand-icon">✦</div>
       <div>
         <div class="brand-name">@senenphotography</div>
         <div class="brand-sub">Programa del evento</div>
       </div>
-    </div>
+    </a>
     <div class="header-actions">
+      <a class="social-btn sm" href="https://wa.me/573045683139" target="_blank" rel="noopener" title="WhatsApp">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.2-.6.9-.8 1.1-.1.2-.3.2-.5.1-1.4-.7-2.4-1.3-3.3-2.9-.1-.2 0-.4.1-.5.2-.2.4-.5.6-.7.1-.2.1-.4 0-.6-.1-.2-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4-.2 0-.4 0-.6 0-.2 0-.5.1-.7.4-.2.3-.9 1-.9 2.3 0 1.4 1 2.7 1.1 2.9.1.2 1.9 3 4.6 4.1 2.3.9 2.7.7 3.2.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.1.2-1.2-.1-.1-.3-.1-.6-.2zM12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C4 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg>
+      </a>
+      <a class="social-btn sm" href="https://www.instagram.com/senenphotography/" target="_blank" rel="noopener" title="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
       <span class="sync-badge" id="sync-badge" title="Estado de sincronización">●</span>
       <button class="btn btn-ghost btn-sm" onclick="showShareModal()" title="Compartir código">🔗</button>
       <button class="btn btn-ghost btn-sm" onclick="exportPDF()">⬇ PDF</button>
@@ -785,6 +864,21 @@
         <span style="font-size:16px;line-height:1">+</span> Añadir momento
       </button>
     </div>
+  </div>
+
+  <!-- FOOTER / BRAND -->
+  <div class="site-footer">
+    <div class="footer-brand">✦ Sénen Photography</div>
+    <div class="footer-tag">Fotografía de bodas en Colombia</div>
+    <div class="social-bar">
+      <a class="social-btn" href="https://www.instagram.com/senenphotography/" target="_blank" rel="noopener" title="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a class="social-btn" href="https://wa.me/573045683139" target="_blank" rel="noopener" title="WhatsApp">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.2-.6.9-.8 1.1-.1.2-.3.2-.5.1-1.4-.7-2.4-1.3-3.3-2.9-.1-.2 0-.4.1-.5.2-.2.4-.5.6-.7.1-.2.1-.4 0-.6-.1-.2-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4-.2 0-.4 0-.6 0-.2 0-.5.1-.7.4-.2.3-.9 1-.9 2.3 0 1.4 1 2.7 1.1 2.9.1.2 1.9 3 4.6 4.1 2.3.9 2.7.7 3.2.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.1.2-1.2-.1-.1-.3-.1-.6-.2zM12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C4 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg>
+      </a>
+    </div>
+    <div class="footer-cta">¿Buscas fotógrafo para tu boda? <a href="https://wa.me/573045683139" target="_blank" rel="noopener">Escríbenos por WhatsApp</a></div>
   </div>
 
 </div>
@@ -1632,10 +1726,12 @@ function exportPDF() {
 
   // Footer
   doc.setFillColor(176, 141, 87);
-  doc.rect(0, H - 10, W, 10, 'F');
-  doc.setFontSize(7);
+  doc.rect(0, H - 14, W, 14, 'F');
+  doc.setFontSize(7.5);
   doc.setTextColor(255, 255, 255);
-  doc.text('Creado con amor por @senenphotography · Fotografía de bodas en Colombia', W/2, H - 4, { align: 'center' });
+  doc.text('Creado con amor por @senenphotography · Fotografía de bodas en Colombia', W/2, H - 8, { align: 'center' });
+  doc.setFontSize(7);
+  doc.text('IG: @senenphotography   ·   WhatsApp: +57 304 568 3139', W/2, H - 3.5, { align: 'center' });
 
   const fname = `programa-boda-${(state.couple.names || 'novios').replace(/[^a-z0-9]/gi,'_').toLowerCase()}.pdf`;
   doc.save(fname);
