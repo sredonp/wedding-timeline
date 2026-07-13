@@ -608,6 +608,75 @@
     letter-spacing: .01em;
   }
 
+  /* ── CARTEL DE INSTALACIÓN (PWA) ── */
+  .install-banner {
+    position: fixed;
+    left: 14px;
+    right: 14px;
+    bottom: 16px;
+    z-index: 999;
+    background: var(--card);
+    border: 1px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 12px 34px rgba(75,58,82,.22);
+    animation: installSlideUp 0.4s ease;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  @keyframes installSlideUp {
+    from { transform: translateY(120%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .install-banner .install-icon {
+    font-size: 1.7rem;
+    flex-shrink: 0;
+  }
+  .install-banner .install-text {
+    flex: 1;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .install-banner .install-text b {
+    color: var(--plum);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .install-banner .install-btn {
+    flex-shrink: 0;
+    background: var(--plum);
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    padding: 9px 16px;
+    font-weight: 600;
+    font-size: 12.5px;
+    font-family: var(--font-body);
+    cursor: pointer;
+  }
+  .install-banner .install-btn:hover { background: var(--rose); }
+  .install-banner .install-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 4px 6px;
+    line-height: 1;
+  }
+  .install-banner .install-close:hover { color: var(--rose); }
+  @media (max-width: 480px) {
+    .install-banner { flex-wrap: wrap; }
+    .install-banner .install-text { font-size: 12px; }
+  }
+
   /* ── TOAST ── */
   .toast {
     position: fixed;
@@ -955,6 +1024,7 @@
 </div>
 
 <!-- TOAST -->
+<div id="install-banner" class="install-banner" style="display:none;"></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1772,6 +1842,74 @@ const manifest = {
 };
 const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
 document.getElementById('manifest-placeholder').href = URL.createObjectURL(blob);
+
+// ── CARTEL DE INSTALACIÓN (PWA) ─────────────────────────
+(function setupInstallBanner() {
+  const STORAGE_KEY = 'boda_install_dismissed';
+  const banner = document.getElementById('install-banner');
+  if (!banner) return;
+
+  // Si ya está instalada (abierta como app) o el usuario ya cerró el cartel, no mostrar nada
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (isStandalone || localStorage.getItem(STORAGE_KEY) === '1') return;
+
+  const ua = window.navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  const isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS/.test(ua);
+
+  let deferredPrompt = null;
+
+  function dismiss() {
+    banner.style.display = 'none';
+    localStorage.setItem(STORAGE_KEY, '1');
+  }
+
+  function showBanner(html) {
+    banner.innerHTML = html;
+    banner.style.display = 'flex';
+    const closeBtn = document.getElementById('install-close-btn');
+    if (closeBtn) closeBtn.addEventListener('click', dismiss);
+  }
+
+  // Android / Chrome: esperar el evento nativo de instalación
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    setTimeout(() => {
+      if (localStorage.getItem(STORAGE_KEY) === '1') return;
+      showBanner(`
+        <span class="install-icon">📲</span>
+        <span class="install-text"><b>Instala esta app</b><br>Accede a tu programa desde la pantalla de inicio.</span>
+        <button class="install-btn" id="install-action-btn">Instalar</button>
+        <button class="install-close" id="install-close-btn">✕</button>
+      `);
+      const actionBtn = document.getElementById('install-action-btn');
+      if (actionBtn) {
+        actionBtn.addEventListener('click', async () => {
+          banner.style.display = 'none';
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            await deferredPrompt.userChoice;
+            deferredPrompt = null;
+          }
+          localStorage.setItem(STORAGE_KEY, '1');
+        });
+      }
+    }, 1500);
+  });
+
+  // iPhone/iPad en Safari: no existe instalación automática, mostrar instrucciones
+  if (isIOS && isSafari) {
+    setTimeout(() => {
+      if (localStorage.getItem(STORAGE_KEY) === '1') return;
+      showBanner(`
+        <span class="install-icon">📲</span>
+        <span class="install-text"><b>Instala esta app</b><br>Toca <b>Compartir</b> ⬆️ y luego <b>"Agregar a pantalla de inicio"</b>.</span>
+        <button class="install-close" id="install-close-btn">✕</button>
+      `);
+    }, 1500);
+  }
+})();
 </script>
 </body>
 </html>
