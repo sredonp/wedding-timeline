@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Mi Boda">
-<title>Programa del Día — @senenphotography</title>
+<title>Minuto a minuto de nuestra boda — @senenphotography</title>
 <link rel="manifest" href="#" id="manifest-placeholder">
 <link rel="apple-touch-icon" id="apple-icon-placeholder">
 <link rel="icon" id="icon-placeholder">
@@ -129,12 +129,19 @@
     border-bottom: 1px solid var(--line);
     padding: 14px 22px;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 12px;
     position: sticky;
     top: 0;
     z-index: 100;
     backdrop-filter: blur(8px);
+  }
+  .header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
   }
   .brand {
     display: flex;
@@ -172,7 +179,10 @@
   .header-actions {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
     gap: 8px;
+    width: 100%;
   }
   .btn {
     border: none;
@@ -212,7 +222,8 @@
     border: none;
     color: var(--muted);
     cursor: pointer;
-    padding: 6px;
+    padding: 8px;
+    font-size: 16px;
     border-radius: 6px;
     transition: all 0.15s;
     display: flex;
@@ -221,7 +232,7 @@
   .btn-icon:hover { background: var(--line); color: var(--plum); }
   .btn-icon.danger:hover { color: var(--danger); }
   @media (hover: none) {
-    .btn-icon { padding: 9px; }
+    .btn-icon { padding: 10px; }
   }
 
   /* ── SETUP SCREEN ── */
@@ -412,7 +423,7 @@
   }
   .ev-icon-btn:hover { border-color: var(--rose); }
 
-  .ev-content-col { padding-top: 4px; padding-right: 96px; }
+  .ev-content-col { padding-top: 4px; padding-right: 150px; }
   .ev-name-row { display: flex; align-items: center; gap: 8px; }
   .ev-name {
     font-size: 16.5px; font-weight: 500; color: var(--ink);
@@ -447,29 +458,43 @@
 
   .event-actions {
     position: absolute;
-    top: 14px;
-    right: 4px;
+    top: 10px;
+    right: 2px;
     display: flex;
     align-items: center;
-    gap: 0;
+    gap: 1px;
     opacity: 0;
     transition: opacity .15s;
   }
   .event:hover .event-actions { opacity: 1; }
-  /* En pantallas táctiles no existe :hover, así que mostramos los
-     botones de mover/editar/borrar siempre (más tenues), y ocultamos
-     la manija de arrastrar porque las flechas son más confiables al tacto */
+  /* En pantallas táctiles no existe :hover. En vez de encimar los botones
+     sobre el texto (obligándolos a ser chiquitos), los bajamos a su propia
+     fila completa debajo del momento, con buen tamaño para el dedo. */
   @media (hover: none) {
-    .event-actions { opacity: .6; }
+    .event-actions {
+      position: static;
+      grid-column: 1 / -1;
+      opacity: 1;
+      justify-content: flex-end;
+      gap: 2px;
+      margin-top: 8px;
+      padding-right: 2px;
+    }
+    .ev-content-col { padding-right: 0; }
     .drag-handle { display: none; }
   }
   .move-btn {
-    font-size: 11px;
-    padding: 5px 5px;
+    font-size: 15px;
+    padding: 8px 7px;
     line-height: 1;
+    font-weight: 700;
   }
-  .move-btn:disabled { opacity: .25; cursor: default; }
+  .move-btn:disabled { opacity: .2; cursor: default; }
   .move-btn:disabled:hover { background: transparent; color: var(--muted); }
+  @media (hover: none) {
+    .move-btn { font-size: 17px; padding: 11px 10px; }
+    .btn-icon { padding: 11px; font-size: 18px; }
+  }
   .drag-handle {
     cursor: grab;
     color: var(--line);
@@ -742,7 +767,7 @@
     .event { grid-template-columns: 74px 40px 1fr; column-gap: 10px; }
     .ev-time { font-size: 18px; }
     .ev-icon-btn { width: 34px; height: 34px; font-size: 15px; }
-    .ev-content-col { padding-right: 80px; }
+    .ev-content-col { padding-right: 0; }
   }
 
   /* ── SETUP TABS ── */
@@ -829,7 +854,7 @@
 <div class="setup-screen" id="setup-screen">
   <div class="setup-card">
     <div class="setup-hero">💍</div>
-    <h1 class="setup-title">Programa de tu boda</h1>
+    <h1 class="setup-title">Minuto a minuto de nuestra boda</h1>
     <p class="setup-sub">Organiza tu día especial y accede desde cualquier dispositivo.</p>
 
     <!-- Tabs -->
@@ -912,13 +937,16 @@
 
   <!-- HEADER -->
   <div class="header">
-    <a class="brand" href="https://www.instagram.com/senenphotography/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;" title="Ver Instagram">
-      <div class="brand-icon">✦</div>
-      <div>
-        <div class="brand-name">@senenphotography</div>
-        <div class="brand-sub">Programa del evento</div>
-      </div>
-    </a>
+    <div class="header-row">
+      <a class="brand" href="https://www.instagram.com/senenphotography/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;" title="Ver Instagram">
+        <div class="brand-icon">✦</div>
+        <div>
+          <div class="brand-name">@senenphotography</div>
+          <div class="brand-sub">Minuto a minuto de nuestra boda</div>
+        </div>
+      </a>
+      <span class="sync-badge" id="sync-badge" title="Estado de sincronización">●</span>
+    </div>
     <div class="header-actions">
       <a class="social-btn sm" href="https://wa.me/573045683139" target="_blank" rel="noopener" title="WhatsApp">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.2-.6.9-.8 1.1-.1.2-.3.2-.5.1-1.4-.7-2.4-1.3-3.3-2.9-.1-.2 0-.4.1-.5.2-.2.4-.5.6-.7.1-.2.1-.4 0-.6-.1-.2-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4-.2 0-.4 0-.6 0-.2 0-.5.1-.7.4-.2.3-.9 1-.9 2.3 0 1.4 1 2.7 1.1 2.9.1.2 1.9 3 4.6 4.1 2.3.9 2.7.7 3.2.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.1.2-1.2-.1-.1-.3-.1-.6-.2zM12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C4 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg>
@@ -926,7 +954,6 @@
       <a class="social-btn sm" href="https://www.instagram.com/senenphotography/" target="_blank" rel="noopener" title="Instagram">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
       </a>
-      <span class="sync-badge" id="sync-badge" title="Estado de sincronización">●</span>
       <button class="btn btn-ghost btn-sm" onclick="showShareModal()" title="Compartir código">🔗</button>
       <button class="btn btn-ghost btn-sm" onclick="exportPDF()">⬇ PDF</button>
       <button class="btn btn-accent btn-sm" onclick="openAddModal()">+ Momento</button>
@@ -1767,8 +1794,8 @@ function exportPDF() {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(9);
   doc.text('@senenphotography', 10, 11);
-  doc.setFontSize(9);
-  doc.text('Programa del evento', W - 10, 11, { align: 'right' });
+  doc.setFontSize(8);
+  doc.text('Minuto a minuto de nuestra boda', W - 10, 11, { align: 'right' });
 
   // Couple names
   doc.setTextColor(75, 58, 82);
