@@ -1141,8 +1141,11 @@
 
 <script>
 // ── CONSTANTS ──────────────────────────────────────────
-const JSONBIN_KEY = '$2a$10$LicWfhmkFL3UuvqC3I1ZIe.8tpfEPZ.P492/hDHh.ACQiCMjuEuiy';
-const JSONBIN_BASE = 'https://api.jsonbin.io/v3';
+// Ya NO guardamos la Access Key de JSONBin aquí. Todas las llamadas pasan
+// por un pequeño proxy (Cloudflare Worker) que agrega la key del lado del
+// servidor. Reemplaza la URL de abajo por la de tu propio Worker una vez
+// desplegado (ver instrucciones de despliegue).
+const JSONBIN_BASE = 'https://boda-proxy.sredonp.workers.dev';
 
 // ── STATE ──────────────────────────────────────────────
 let state = {
@@ -1279,11 +1282,10 @@ function loadLocal() {
   return false;
 }
 
-// ── JSONBIN API ────────────────────────────────────────
-// Usamos una Access Key (no la Master Key) — solo tiene permiso sobre
-// la API de Bins (crear/leer/actualizar), no sobre el resto de la cuenta.
+// ── JSONBIN API (vía proxy) ────────────────────────────
+// Ya no mandamos X-Access-Key desde el navegador: el Worker la agrega.
 function jsonbinHeaders(write = false) {
-  const h = { 'Content-Type': 'application/json', 'X-Access-Key': JSONBIN_KEY };
+  const h = { 'Content-Type': 'application/json' };
   if (write) h['X-Bin-Private'] = 'false'; // público para que cualquier dispositivo con el código pueda leer
   return h;
 }
@@ -1301,7 +1303,7 @@ async function createBinRemote(data) {
 
 async function readBinRemote(binId) {
   const res = await fetch(`${JSONBIN_BASE}/b/${binId}/latest`, {
-    headers: { 'X-Access-Key': JSONBIN_KEY }
+    headers: jsonbinHeaders()
   });
   if (!res.ok) throw new Error('Bin no encontrado: ' + res.status);
   const json = await res.json();
