@@ -1119,7 +1119,7 @@
       </div>
       <div>
         <div class="field-label">Notas (opcional)</div>
-        <input class="field-input" id="ev-notes" type="text" placeholder="Detalles adicionales..." maxlength="120">
+        <input class="field-input" id="ev-notes" type="text" placeholder="Ej: canción, lugar, persona responsable..." maxlength="120">
       </div>
       <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:4px 0">
         <input type="checkbox" id="ev-highlight" style="width:16px;height:16px;accent-color:var(--gold)">
@@ -1173,33 +1173,33 @@ const CAT_ICONS = {
 // ── PROGRAMA BASE (precargado en cada boda nueva) ──────
 const DEFAULT_EVENTS = [
   { name:'Despertar, ducharse',                          hour:8,  minute:0,  duration:30,  cat:'prep',   notes:'', highlight:false },
-  { name:'Desayunar',                                    hour:8,  minute:30, duration:60,  cat:'prep',   notes:'', highlight:false },
-  { name:'Revisar detalles pendientes',                  hour:9,  minute:30, duration:150, cat:'prep',   notes:'', highlight:false },
+  { name:'Desayunar',                                    hour:8,  minute:30, duration:60,  cat:'prep',   notes:'Ej: Desayuno ligero para no tener el estómago vacío', highlight:false },
+  { name:'Revisar detalles pendientes',                  hour:9,  minute:30, duration:150, cat:'prep',   notes:'Ej: Arras, anillos, ramo, documentos, lista de invitados', highlight:false },
   { name:'Almuerzo',                                     hour:12, minute:0,  duration:120, cat:'prep',   notes:'', highlight:false },
-  { name:'Inicio maquillaje y peinado',                  hour:14, minute:0,  duration:90,  cat:'glam',   notes:'', highlight:false },
+  { name:'Inicio maquillaje y peinado',                  hour:14, minute:0,  duration:90,  cat:'glam',   notes:'Ej: Salón Villa Rosa – confirmar cita con anticipación', highlight:false },
   { name:'Llega el fotógrafo',                           hour:15, minute:30, duration:90,  cat:'foto',   notes:'', highlight:false },
-  { name:'Fotos con familiares, vestidos de novios',     hour:17, minute:0,  duration:60,  cat:'foto',   notes:'', highlight:false },
+  { name:'Fotos con familiares, vestidos de novios',     hour:17, minute:0,  duration:60,  cat:'foto',   notes:'Ej: Lista de fotos grupales: familia novia, familia novio, padrinos', highlight:false },
   { name:'El novio sale hacia la iglesia',               hour:18, minute:0,  duration:10,  cat:'evento', notes:'', highlight:false },
   { name:'La novia sale hacia la iglesia',               hour:18, minute:10, duration:20,  cat:'evento', notes:'', highlight:false },
-  { name:'Inicio ceremonia religiosa / civil',           hour:18, minute:30, duration:60,  cat:'evento', notes:'', highlight:true  },
-  { name:'Fotografías en la iglesia',                    hour:19, minute:30, duration:30,  cat:'foto',   notes:'', highlight:false },
-  { name:'Llegada y fotos de novios en el salón (vacío)',hour:20, minute:0,  duration:15,  cat:'foto',   notes:'', highlight:false },
+  { name:'Inicio ceremonia religiosa / civil',           hour:18, minute:30, duration:60,  cat:'evento', notes:'Ej: Marcha nupcial: Canon en Re – Pachelbel', highlight:true  },
+  { name:'Fotografías a la salida de la iglesia',        hour:19, minute:30, duration:30,  cat:'foto',   notes:'', highlight:false },
+  { name:'Llegada y fotos de novios en el salón (vacío)',hour:20, minute:0,  duration:15,  cat:'foto',   notes:'Ej: Aprovechar decoración y luces antes de que lleguen los invitados', highlight:false },
   { name:'Ingreso de invitados al salón',                hour:20, minute:15, duration:15,  cat:'evento', notes:'', highlight:false },
-  { name:'Entrada de los esposos al salón y vals',       hour:20, minute:30, duration:15,  cat:'fiesta', notes:'', highlight:true  },
-  { name:'Baile de los esposos',                         hour:20, minute:45, duration:5,   cat:'fiesta', notes:'', highlight:false },
-  { name:'Brindis y palabras de bienvenida',             hour:20, minute:50, duration:5,   cat:'fiesta', notes:'', highlight:false },
+  { name:'Entrada de los esposos al salón y vals',       hour:20, minute:30, duration:15,  cat:'fiesta', notes:'Ej: Canción para el vals: Hasta mi final – Il Divo', highlight:true  },
+  { name:'Baile de los esposos',                         hour:20, minute:45, duration:5,   cat:'fiesta', notes:'Ej: Canción sorpresa o coreografía especial', highlight:false },
+  { name:'Brindis y palabras de bienvenida',             hour:20, minute:50, duration:5,   cat:'fiesta', notes:'Ej: Palabras a cargo de: padrino / familiar designado', highlight:false },
   { name:'Primera picada: Pinchos de pechuga',           hour:20, minute:55, duration:35,  cat:'fiesta', notes:'', highlight:false },
-  { name:'Sesión fotográfica con los invitados',         hour:21, minute:0,  duration:30,  cat:'foto',   notes:'', highlight:false },
+  { name:'Sesión fotográfica con los invitados',         hour:21, minute:0,  duration:30,  cat:'foto',   notes:'Ej: Zona de fotos con marco o backdrop decorado', highlight:false },
   { name:'Segunda picada: Quibbes',                      hour:21, minute:30, duration:30,  cat:'fiesta', notes:'', highlight:false },
-  { name:'Primera tanda musical',                        hour:21, minute:30, duration:90,  cat:'fiesta', notes:'', highlight:false },
-  { name:'Apertura del bufet acompañado de saxofón',     hour:22, minute:0,  duration:60,  cat:'fiesta', notes:'', highlight:true  },
+  { name:'Primera tanda musical',                        hour:21, minute:30, duration:90,  cat:'fiesta', notes:'Ej: Género: vallenato / cumbia / salsa – confirmar con el DJ', highlight:false },
+  { name:'Apertura del bufet acompañado de saxofón',     hour:22, minute:0,  duration:60,  cat:'fiesta', notes:'Ej: Nombre del saxofonista / repertorio acordado', highlight:true  },
   { name:'Tercera picada: Deditos',                      hour:23, minute:0,  duration:60,  cat:'fiesta', notes:'', highlight:false },
   { name:'Segunda tanda musical',                        hour:23, minute:0,  duration:60,  cat:'fiesta', notes:'', highlight:false },
-  { name:'Lanzamiento del ramo',                         hour:23, minute:0,  duration:30,  cat:'fiesta', notes:'', highlight:false },
-  { name:'Apertura de la mesa de dulces',                hour:23, minute:30, duration:30,  cat:'fiesta', notes:'', highlight:false },
-  { name:'Hora loca',                                    hour:0,  minute:0,  duration:30,  cat:'fiesta', notes:'', highlight:true,  nextDay:true },
-  { name:'DJ',                                           hour:0,  minute:30, duration:75,  cat:'fiesta', notes:'', highlight:false, nextDay:true },
-  { name:'Palabras de agradecimiento y despedida',       hour:1,  minute:45, duration:15,  cat:'fiesta', notes:'', highlight:false, nextDay:true },
+  { name:'Lanzamiento del ramo',                         hour:23, minute:0,  duration:30,  cat:'fiesta', notes:'Ej: Canción para el lanzamiento del ramo', highlight:false },
+  { name:'Apertura de la mesa de dulces',                hour:23, minute:30, duration:30,  cat:'fiesta', notes:'Ej: Incluye: macarons, chocolates, algodón de azúcar', highlight:false },
+  { name:'Hora loca',                                    hour:0,  minute:0,  duration:30,  cat:'fiesta', notes:'Ej: Accesorios, antifaces, serpentinas – coordinar con animador', highlight:true,  nextDay:true },
+  { name:'DJ',                                           hour:0,  minute:30, duration:75,  cat:'fiesta', notes:'Ej: Solicitar lista de canciones especiales con anticipación', highlight:false, nextDay:true },
+  { name:'Palabras de agradecimiento y despedida',       hour:1,  minute:45, duration:15,  cat:'fiesta', notes:'Ej: A cargo de los novios o un familiar', highlight:false, nextDay:true },
   { name:'Fin del evento – inicio de luna de miel',      hour:2,  minute:0,  duration:0,   cat:'prep',   notes:'', highlight:true,  nextDay:true },
 ];
 
@@ -1632,7 +1632,9 @@ function refreshNotesField() {
 
 // ── RENDER ─────────────────────────────────────────────
 function fmtTime(h, m) {
-  return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+  const period = h < 12 ? 'a.m.' : 'p.m.';
+  const h12 = h % 12 || 12;
+  return h12 + ':' + String(m).padStart(2,'0') + ' ' + period;
 }
 function fmtDur(min) {
   if (min < 60) return min + ' min';
