@@ -503,28 +503,70 @@
   }
   .drag-handle:active { cursor: grabbing; }
 
-  /* ── ADD BUTTON ── */
-  .add-btn-wrap {
-    display: flex;
-    justify-content: center;
-    margin: 34px 0 8px;
+  /* ── NOTAS Y PENDIENTES ── */
+  .notes-wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 22px 20px 0;
   }
-  .btn-add {
+  .notes-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px 14px;
+  }
+  .notes-title {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--plum);
+    margin-bottom: 8px;
+  }
+  .notes-textarea {
+    width: 100%;
+    min-height: 90px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    color: var(--ink);
+    font-size: 16px;
+    font-family: var(--font-body);
+    padding: 11px 14px;
+    outline: none;
+    resize: vertical;
+    line-height: 1.5;
+    transition: border-color 0.15s;
+  }
+  .notes-textarea:focus { border-color: var(--gold); background: #fff; }
+  .notes-textarea::placeholder { color: var(--muted); opacity: .7; }
+
+  /* ── BOTÓN FLOTANTE: AÑADIR MOMENTO ── */
+  .fab-add {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
     background: var(--plum);
     color: #fff;
     border: none;
     border-radius: 30px;
-    padding: 12px 30px;
+    padding: 14px 26px;
     cursor: pointer;
-    font-size: 13.5px;
+    font-size: 14px;
     letter-spacing: .02em;
     font-family: var(--font-body);
     font-weight: 600;
-    box-shadow: 0 6px 18px rgba(75,58,82,.22);
+    box-shadow: 0 10px 26px rgba(75,58,82,.3);
     transition: .15s;
-    display: flex; align-items: center; gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 150;
+    white-space: nowrap;
   }
-  .btn-add:hover { background: var(--rose); transform: translateY(-1px); }
+  .fab-add:hover { background: var(--rose); transform: translateX(-50%) translateY(-2px); }
+  .fab-add:active { transform: translateX(-50%) scale(.97); }
 
   /* ── MODAL ── */
   .modal-overlay {
@@ -759,7 +801,7 @@
     .btn { padding: 7px 12px; font-size: 12px; }
     .couple-banner { padding: 18px 16px; }
     .couple-names { font-size: 24px; }
-    .timeline-wrap { padding: 20px 12px 100px; }
+    .timeline-wrap { padding: 20px 12px 110px; }
     .setup-card { padding: 30px 22px; }
     .brand-name { font-size: 13px; }
     .modal { padding: 20px; }
@@ -840,8 +882,7 @@
 
   /* ── PRINT / PDF ── */
   @media print {
-    .header, .couple-actions, .event-actions, .add-btn-wrap,
-    .btn-add { display: none !important; }
+    .header, .couple-actions, .event-actions, .fab-add { display: none !important; }
     body { background: #fff; }
     .event:hover { background: none; }
     .couple-names { color: var(--plum); }
@@ -948,15 +989,14 @@
       <span class="sync-badge" id="sync-badge" title="Estado de sincronización">●</span>
     </div>
     <div class="header-actions">
-      <a class="social-btn sm" href="https://wa.me/573045683139" target="_blank" rel="noopener" title="WhatsApp">
+      <a class="social-btn" href="https://wa.me/573045683139" target="_blank" rel="noopener" title="WhatsApp">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.2-.6.9-.8 1.1-.1.2-.3.2-.5.1-1.4-.7-2.4-1.3-3.3-2.9-.1-.2 0-.4.1-.5.2-.2.4-.5.6-.7.1-.2.1-.4 0-.6-.1-.2-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4-.2 0-.4 0-.6 0-.2 0-.5.1-.7.4-.2.3-.9 1-.9 2.3 0 1.4 1 2.7 1.1 2.9.1.2 1.9 3 4.6 4.1 2.3.9 2.7.7 3.2.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.1.2-1.2-.1-.1-.3-.1-.6-.2zM12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C4 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg>
       </a>
-      <a class="social-btn sm" href="https://www.instagram.com/senenphotography/" target="_blank" rel="noopener" title="Instagram">
+      <a class="social-btn" href="https://www.instagram.com/senenphotography/" target="_blank" rel="noopener" title="Instagram">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
       </a>
-      <button class="btn btn-ghost btn-sm" onclick="showShareModal()" title="Compartir código">🔗</button>
-      <button class="btn btn-ghost btn-sm" onclick="exportPDF()">⬇ PDF</button>
-      <button class="btn btn-accent btn-sm" onclick="openAddModal()">+ Momento</button>
+      <button class="btn btn-ghost" onclick="showShareModal()" title="Compartir código">🔗 Compartir</button>
+      <button class="btn btn-ghost" onclick="exportPDF()">⬇ PDF</button>
     </div>
   </div>
 
@@ -973,15 +1013,28 @@
     </div>
   </div>
 
+  <!-- NOTAS Y PENDIENTES -->
+  <div class="notes-wrap">
+    <div class="notes-card">
+      <div class="notes-title">📝 Notas y pendientes</div>
+      <textarea
+        class="notes-textarea"
+        id="notes-textarea"
+        placeholder="Cosas por comprar, tareas pendientes, recordatorios para el día..."
+        oninput="onNotesInput()"
+      ></textarea>
+    </div>
+  </div>
+
   <!-- TIMELINE -->
   <div class="timeline-wrap">
     <div id="timeline-list"></div>
-    <div class="add-btn-wrap">
-      <button class="btn-add" onclick="openAddModal()">
-        <span style="font-size:16px;line-height:1">+</span> Añadir momento
-      </button>
-    </div>
   </div>
+
+  <!-- BOTÓN FLOTANTE: AÑADIR MOMENTO -->
+  <button class="fab-add" onclick="openAddModal()" title="Añadir momento">
+    <span style="font-size:18px;line-height:1">+</span> Añadir momento
+  </button>
 
   <!-- FOOTER / BRAND -->
   <div class="site-footer">
@@ -1083,7 +1136,8 @@ const JSONBIN_BASE = 'https://api.jsonbin.io/v3';
 // ── STATE ──────────────────────────────────────────────
 let state = {
   couple: { names: '', date: '', venue: '' },
-  events: []
+  events: [],
+  notes: ''
 };
 let editingId = null;
 let pendingNextDay = false; // whether the event being added/edited is in the early hours of the next day
@@ -1272,6 +1326,7 @@ function startPolling() {
         saveLocal();
         updateBanner();
         renderTimeline();
+        refreshNotesField();
         showToast('Sincronizado con cambios externos ↻');
       }
       lastRemoteHash = hash;
@@ -1291,6 +1346,7 @@ document.addEventListener('visibilitychange', async () => {
       saveLocal();
       updateBanner();
       renderTimeline();
+      refreshNotesField();
       showToast('Sincronizado con cambios externos ↻');
     }
     lastRemoteHash = hash;
@@ -1463,6 +1519,7 @@ function showApp() {
   updateBanner();
   renderTimeline();
   initSortable();
+  document.getElementById('notes-textarea').value = state.notes || '';
 }
 
 function resetApp() {
@@ -1523,6 +1580,22 @@ function updateBanner() {
       d.toLocaleDateString('es-CO', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   }
   document.getElementById('couple-venue-display').textContent = venue || '';
+}
+
+// ── NOTAS Y PENDIENTES ─────────────────────────────────
+let notesDebounce = null;
+function onNotesInput() {
+  state.notes = document.getElementById('notes-textarea').value;
+  clearTimeout(notesDebounce);
+  notesDebounce = setTimeout(() => { save(); }, 600);
+}
+
+// Actualiza el textarea con lo que llegue de otro dispositivo, pero solo
+// si la persona no está escribiendo en él en este momento (para no borrarle lo que teclea)
+function refreshNotesField() {
+  const el = document.getElementById('notes-textarea');
+  if (!el || document.activeElement === el) return;
+  el.value = state.notes || '';
 }
 
 // ── RENDER ─────────────────────────────────────────────
