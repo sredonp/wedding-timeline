@@ -853,9 +853,9 @@
   /* ── ACCESS CODE DISPLAY ── */
   .access-code-display {
     font-family: 'Courier New', monospace;
-    font-size: 34px;
+    font-size: 19px;
     font-weight: 700;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.06em;
     color: var(--plum);
     background: var(--paper);
     border: 2px solid var(--gold);
@@ -863,11 +863,13 @@
     padding: 16px;
     margin: 0 auto 8px;
     text-align: center;
+    word-break: break-all;
+    line-height: 1.5;
   }
   .code-input {
     font-family: 'Courier New', monospace;
-    font-size: 22px;
-    letter-spacing: 0.12em;
+    font-size: 15px;
+    letter-spacing: 0.04em;
     text-align: center;
     font-weight: 700;
     color: var(--plum);
@@ -939,7 +941,7 @@
         <div>
           <div class="field-label">Código de acceso</div>
           <input class="field-input code-input" id="setup-code" type="text"
-            placeholder="Ej: ABC-7X2" maxlength="10"
+            placeholder="Ej: 65F1-A2B3-C4D5-E6F7-A8B9-C0D1" maxlength="40"
             oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9\-]/g,'')">
           <p style="margin-top:8px;font-size:12px;color:var(--muted);">El código te lo dio quien creó el programa.</p>
         </div>
@@ -1148,6 +1150,24 @@ let state = {
   events: [],
   notes: ''
 };
+
+// Garantiza que el estado siempre tenga la forma esperada, sin importar
+// qué llegue de JSONBin o de localStorage (evita errores como
+// "Cannot read properties of undefined (reading 'includes')" si algún
+// campo llega incompleto o corrupto).
+function normalizeState(raw) {
+  const r = raw || {};
+  const couple = r.couple || {};
+  return {
+    couple: {
+      names: couple.names || '',
+      date:  couple.date  || '',
+      venue: couple.venue || ''
+    },
+    events: Array.isArray(r.events) ? r.events : [],
+    notes: typeof r.notes === 'string' ? r.notes : ''
+  };
+}
 let editingId = null;
 let pendingNextDay = false; // whether the event being added/edited is in the early hours of the next day
 let currentBinId = null;   // JSONBin bin ID (raw)
@@ -1217,12 +1237,24 @@ const SECTION_BREAKS = [
 ];
 
 // ── CODE ↔ BIN ID ──────────────────────────────────────
-// We store a mapping of code → binId in localStorage as a local directory.
-// The bin itself holds the canonical wedding data.
+// El código ahora ES el binId codificado (no un alias que haya que "buscar"
+// en algún lado). Así, cualquier dispositivo puede decodificar el código y
+// llegar directo al bin, sin depender del localStorage del navegador donde
+// se creó el programa (que era la causa de que el código nunca funcionara
+// en un dispositivo nuevo que no hubiera abierto antes el link directo).
 function codeFromBinId(binId) {
-  // Convert last 6 hex chars to readable code like "A3F-9B2"
-  const seg = binId.slice(-6).toUpperCase();
-  return seg.slice(0,3) + '-' + seg.slice(3);
+  // binId es un ObjectId hexadecimal (24 caracteres). Se muestra en
+  // mayúsculas y agrupado de a 4 para que sea más fácil de leer/copiar.
+  const upper = String(binId).toUpperCase();
+  return upper.match(/.{1,4}/g).join('-');
+}
+
+function binIdFromCode(code) {
+  // Revierte codeFromBinId: quita guiones/espacios y vuelve a minúsculas.
+  const clean = String(code).replace(/[\s-]/g, '').toLowerCase();
+  // Validamos que sea un ObjectId hexadecimal válido de 24 caracteres
+  if (!/^[0-9a-f]{24}$/.test(clean)) return null;
+  return clean;
 }
 
 function saveLocal() {
@@ -1238,7 +1270,7 @@ function loadLocal() {
     const d = localStorage.getItem('boda_pwa_v3');
     if (d) {
       const parsed = JSON.parse(d);
-      state = parsed.state || state;
+      state = normalizeState(parsed.state);
       currentBinId = parsed.binId || null;
       currentCode  = parsed.code  || null;
       return true;
@@ -1285,23 +1317,6 @@ async function updateBinRemote(binId, data) {
   if (!res.ok) throw new Error('Error al guardar: ' + res.status);
 }
 
-function getBinIdFromCode(code) {
-  // Try localStorage directory first
-  try {
-    const dir = JSON.parse(localStorage.getItem('boda_dir_v3') || '{}');
-    if (dir[code]) return dir[code];
-  } catch(e) {}
-  return null;
-}
-
-function saveBinIdForCode(code, binId) {
-  try {
-    const dir = JSON.parse(localStorage.getItem('boda_dir_v3') || '{}');
-    dir[code] = binId;
-    localStorage.setItem('boda_dir_v3', JSON.stringify(dir));
-  } catch(e) {}
-}
-
 // ── SYNC STATUS ────────────────────────────────────────
 function setSyncStatus(status, text) {
   const badge = document.getElementById('sync-badge');
@@ -1338,7 +1353,7 @@ function startPolling() {
       const hash = JSON.stringify(remote.state);
       if (lastRemoteHash && hash !== lastRemoteHash) {
         // Remote changed — update local state
-        state = remote.state;
+        state = normalizeState(remote.state);
         saveLocal();
         updateBanner();
         renderTimeline();
@@ -1358,7 +1373,7 @@ document.addEventListener('visibilitychange', async () => {
     const remote = await readBinRemote(currentBinId);
     const hash = JSON.stringify(remote.state);
     if (lastRemoteHash && hash !== lastRemoteHash) {
-      state = remote.state;
+      state = normalizeState(remote.state);
       saveLocal();
       updateBanner();
       renderTimeline();
@@ -1398,7 +1413,6 @@ async function createBin() {
 
     // Update bin with code embedded
     await updateBinRemote(binId, { state, code: currentCode });
-    saveBinIdForCode(currentCode, binId);
     saveLocal();
 
     // Update URL hash for direct linking
@@ -1420,28 +1434,18 @@ async function createBin() {
 // ── JOIN WITH CODE ─────────────────────────────────────
 async function joinBin() {
   const code = document.getElementById('setup-code').value.trim().toUpperCase();
-  if (!code || code.length < 6) { showToast('Ingresa un código válido'); return; }
+  if (!code) { showToast('Ingresa un código válido'); return; }
 
   const btn = document.getElementById('btn-join');
   btn.disabled = true;
   btn.textContent = 'Buscando...';
 
-  let binId = getBinIdFromCode(code);
+  // El código codifica directamente el binId — funciona desde cualquier
+  // dispositivo, sin depender de nada guardado localmente.
+  const binId = binIdFromCode(code);
 
   if (!binId) {
-    const params = new URLSearchParams(window.location.search);
-    const urlBinId = params.get('b');
-    if (urlBinId) {
-      const urlCode = codeFromBinId(urlBinId);
-      if (urlCode === code) {
-        binId = urlBinId;
-        saveBinIdForCode(code, binId);
-      }
-    }
-  }
-
-  if (!binId) {
-    showToast('Código no encontrado en este dispositivo. Usa el link directo.');
+    showToast('Código inválido. Revísalo e inténtalo de nuevo.');
     btn.disabled = false;
     btn.textContent = 'Acceder →';
     return;
@@ -1449,10 +1453,9 @@ async function joinBin() {
 
   try {
     const remote = await readBinRemote(binId);
-    state = remote.state || { couple: {}, events: [] };
+    state = normalizeState(remote.state);
     currentBinId = binId;
     currentCode  = code;
-    saveBinIdForCode(code, binId);
     saveLocal();
     window.location.hash = code;
     lastRemoteHash = JSON.stringify(state);
@@ -1493,16 +1496,17 @@ function copyLink() {
 // ── INIT ───────────────────────────────────────────────
 (async function init() {
   const params = new URLSearchParams(window.location.search);
-  const urlBinId = params.get('b');
-  const urlCode  = window.location.hash.replace('#','').toUpperCase();
+  const urlHashCode = window.location.hash.replace('#','').toUpperCase();
+  // Compatibilidad: si el link trae ?b=binId (links viejos) lo usamos tal cual;
+  // si no, decodificamos el binId directamente del código en el hash.
+  const urlBinId = params.get('b') || (urlHashCode ? binIdFromCode(urlHashCode) : null);
 
-  if (urlBinId && urlCode) {
-    saveBinIdForCode(urlCode, urlBinId);
+  if (urlBinId) {
     currentBinId = urlBinId;
-    currentCode  = urlCode;
+    currentCode  = urlHashCode || codeFromBinId(urlBinId);
     try {
       const remote = await readBinRemote(urlBinId);
-      state = remote.state || { couple: {}, events: [] };
+      state = normalizeState(remote.state);
       saveLocal();
       lastRemoteHash = JSON.stringify(state);
       startPolling();
@@ -1516,7 +1520,7 @@ function copyLink() {
   if (restored && currentBinId && state.couple.names) {
     try {
       const remote = await readBinRemote(currentBinId);
-      state = remote.state || state;
+      state = normalizeState(remote.state);
       saveLocal();
     } catch(e) { /* use local */ }
     lastRemoteHash = JSON.stringify(state);
@@ -1557,9 +1561,9 @@ function setupFabAutoHide() {
 function resetApp() {
   document.getElementById('setup-screen').style.display = 'flex';
   document.getElementById('app-wrap').classList.remove('visible');
-  document.getElementById('setup-names').value = state.couple.names;
-  document.getElementById('setup-date').value = state.couple.date;
-  document.getElementById('setup-venue').value = state.couple.venue;
+  document.getElementById('setup-names').value = state.couple.names || '';
+  document.getElementById('setup-date').value = state.couple.date || '';
+  document.getElementById('setup-venue').value = state.couple.venue || '';
 
   const btn = document.getElementById('btn-create');
   const cancelBtn = document.getElementById('btn-cancel-edit');
@@ -1600,11 +1604,20 @@ function clearAll() {
 
 // ── BANNER ─────────────────────────────────────────────
 function updateBanner() {
-  const { names, date, venue } = state.couple;
-  document.getElementById('couple-names-display').innerHTML =
-    names.includes('&') || names.includes('y')
-      ? names.replace(/(&|y)/g, '<span>$1</span>')
-      : `<span>${names}</span>`;
+  const { names = '', date = '', venue = '' } = state.couple || {};
+  // Los nombres vienen del estado compartido (JSONBin), así que no deben
+  // poder inyectar HTML/JS. Escapamos cada fragmento de texto individualmente
+  // (no la cadena ya armada con <span>) para que el "&" real de la pareja no
+  // se confunda con el HTML que agregamos para resaltarlo.
+  let html;
+  if (names.includes('&') || names.includes('y')) {
+    html = names.split(/(&|y)/g)
+      .map(part => (part === '&' || part === 'y') ? `<span>${escHtml(part)}</span>` : escHtml(part))
+      .join('');
+  } else {
+    html = `<span>${escHtml(names)}</span>`;
+  }
+  document.getElementById('couple-names-display').innerHTML = html;
 
   if (date) {
     const d = new Date(date + 'T00:00:00');
