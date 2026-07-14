@@ -130,7 +130,8 @@
     padding: 14px 22px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    align-items: center;
+    gap: 10px;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -139,8 +140,8 @@
   .header-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
     gap: 10px;
   }
   .brand {
@@ -149,15 +150,15 @@
     gap: 10px;
   }
   .brand-icon {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     background: var(--card);
     border: 1px solid var(--gold);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 15px;
     color: var(--gold);
     flex-shrink: 0;
   }
@@ -165,7 +166,7 @@
     font-family: var(--font-display);
     font-style: italic;
     font-weight: 600;
-    font-size: 15px;
+    font-size: 19px;
     color: var(--plum);
     letter-spacing: 0.02em;
     line-height: 1.2;
@@ -179,7 +180,7 @@
   .header-actions {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     flex-wrap: wrap;
     gap: 8px;
     width: 100%;
@@ -383,10 +384,10 @@
   .event {
     position: relative;
     display: grid;
-    grid-template-columns: 84px 42px 1fr;
-    column-gap: 8px;
+    grid-template-columns: 68px 1fr;
+    column-gap: 10px;
     align-items: start;
-    padding: 10px 4px 8px;
+    padding: 9px 4px 7px;
     border-bottom: 1px dashed var(--line);
     transition: background .15s;
   }
@@ -399,13 +400,22 @@
     background: var(--gold); border-radius: 4px;
   }
 
-  .ev-time-col { padding-top: 2px; cursor: pointer; }
+  /* Columna izquierda: emoji → hora → duración apilados */
+  .ev-time-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    cursor: pointer;
+    padding-top: 1px;
+  }
+  .ev-cat-emoji { font-size: 18px; line-height: 1; }
   .ev-time {
     font-family: var(--font-body);
     font-weight: 700;
-    font-size: 20px;
+    font-size: 18px;
     color: var(--ink);
-    line-height: 1.05;
+    line-height: 1;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.01em;
     border-radius: 5px;
@@ -415,42 +425,52 @@
     transition: background .15s;
   }
   .ev-time-col:hover .ev-time { background: #F1E6D8; }
-  .ev-duration { font-size: 11px; color: var(--muted); margin-top: 5px; letter-spacing: .01em; }
+  .ev-duration { font-size: 10px; color: var(--muted); margin-top: 1px; letter-spacing: .01em; padding-left: 4px; }
 
-  .ev-icon-col { display: flex; justify-content: center; padding-top: 2px; }
-  .ev-icon-btn {
-    width: 40px; height: 40px; border-radius: 50%;
-    background: var(--card);
-    border: 1px solid var(--line);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; cursor: pointer;
-    box-shadow: 0 1px 3px rgba(75,58,82,.08);
-    transition: border-color .15s;
-    flex-shrink: 0;
+  /* Columna derecha */
+  .ev-content-col { padding-top: 2px; }
+
+  /* Fila título + acciones */
+  .ev-name-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: space-between;
   }
-  .ev-icon-btn:hover { border-color: var(--rose); }
-
-  .ev-content-col { padding-top: 4px; padding-right: 150px; }
-  .ev-name-row { display: flex; align-items: center; gap: 8px; }
   .ev-name {
-    font-size: 16.5px; font-weight: 500; color: var(--ink);
-    outline: none; line-height: 1.4; padding: 3px 6px; border-radius: 5px;
-    min-height: 1.4em; flex: 1;
+    font-size: 16px; font-weight: 500; color: var(--ink);
+    outline: none; line-height: 1.35; padding: 2px 5px; border-radius: 5px;
+    min-height: 1.35em; flex: 1; min-width: 0;
   }
   .ev-name:hover { background: #F4EEE3; }
   .ev-name:focus { background: #F1E6D8; }
-  .ev-star { color: var(--gold); font-size: 14px; flex-shrink: 0; }
+  .ev-star { color: var(--gold); font-size: 13px; flex-shrink: 0; }
+
+  /* Acciones inline junto al título */
+  .event-actions {
+    display: flex;
+    align-items: center;
+    gap: 0px;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity .15s;
+  }
+  .event:hover .event-actions { opacity: 1; }
+  @media (hover: none) {
+    .event-actions { opacity: 1; }
+    .drag-handle { display: none; }
+  }
 
   .ev-meta {
-    font-size: 12px; color: var(--muted);
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-    margin-top: 3px; padding: 0 6px;
+    font-size: 11.5px; color: var(--muted);
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    margin-top: 3px; padding: 0 5px;
   }
   .ev-notes { font-style: italic; color: var(--muted); }
 
   .cat-badge {
     font-size: 10px;
-    padding: 2px 9px;
+    padding: 2px 8px;
     border-radius: 20px;
     font-weight: 600;
     text-transform: uppercase;
@@ -463,44 +483,17 @@
   .b-fiesta { background: rgba(138,106,154,0.15); color: #6f4f7e; }
   .b-other  { background: rgba(139,128,120,0.15); color: #6b625b; }
 
-  .event-actions {
-    position: absolute;
-    top: 10px;
-    right: 2px;
-    display: flex;
-    align-items: center;
-    gap: 1px;
-    opacity: 0;
-    transition: opacity .15s;
-  }
-  .event:hover .event-actions { opacity: 1; }
-  /* En pantallas táctiles no existe :hover. En vez de encimar los botones
-     sobre el texto (obligándolos a ser chiquitos), los bajamos a su propia
-     fila completa debajo del momento, con buen tamaño para el dedo. */
-  @media (hover: none) {
-    .event-actions {
-      position: static;
-      grid-column: 1 / -1;
-      opacity: 1;
-      justify-content: flex-end;
-      gap: 0px;
-      margin-top: 2px;
-      padding-right: 2px;
-    }
-    .ev-content-col { padding-right: 0; }
-    .drag-handle { display: none; }
-  }
   .move-btn {
-    font-size: 15px;
-    padding: 8px 7px;
+    font-size: 13px;
+    padding: 5px 6px;
     line-height: 1;
     font-weight: 700;
   }
   .move-btn:disabled { opacity: .2; cursor: default; }
   .move-btn:disabled:hover { background: transparent; color: var(--muted); }
   @media (hover: none) {
-    .move-btn { font-size: 16px; padding: 7px 9px; }
-    .btn-icon { padding: 7px; font-size: 17px; }
+    .move-btn { font-size: 14px; padding: 6px 7px; }
+    .btn-icon { padding: 6px; font-size: 15px; }
   }
   .drag-handle {
     cursor: grab;
@@ -821,8 +814,9 @@
     .brand-name { font-size: 13px; }
     .modal { padding: 20px; }
     .modal-row { grid-template-columns: 1fr; }
-    .event { grid-template-columns: 70px 38px 1fr; column-gap: 6px; }
+    .event { grid-template-columns: 62px 1fr; column-gap: 8px; }
     .ev-time { font-size: 17px; }
+    .ev-cat-emoji { font-size: 16px; }
     .ev-icon-btn { width: 34px; height: 34px; font-size: 15px; }
     .ev-content-col { padding-right: 0; }
   }
@@ -993,7 +987,7 @@
 
   <!-- HEADER -->
   <div class="header">
-    <div class="header-row">
+    <div class="header-row" style="position:relative;">
       <a class="brand" href="https://www.instagram.com/senenphotography/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;" title="Ver Instagram">
         <div class="brand-icon">✦</div>
         <div>
@@ -1001,7 +995,7 @@
           <div class="brand-sub">Minuto a minuto de nuestra boda</div>
         </div>
       </a>
-      <span class="sync-badge" id="sync-badge" title="Estado de sincronización">●</span>
+      <span class="sync-badge" id="sync-badge" title="Estado de sincronización" style="position:absolute;right:0;">●</span>
     </div>
     <div class="header-actions">
       <a class="social-btn" href="https://wa.me/573045683139" target="_blank" rel="noopener" title="WhatsApp">
@@ -1726,30 +1720,27 @@ function renderTimeline() {
     html += `
     <div class="event ${highlighted}" data-id="${ev.id}">
       <div class="ev-time-col" onclick="quickEditTime('${ev.id}')">
+        <span class="ev-cat-emoji">${icon}</span>
         <div class="ev-time">${fmtTime(ev.hour, ev.minute)}</div>
         <div class="ev-duration">${fmtDur(ev.duration)}</div>
-        ${ev.nextDay ? '<span class="ev-nextday-tag">🌙 día siguiente</span>' : ''}
-      </div>
-      <div class="ev-icon-col">
-        <button class="ev-icon-btn" type="button" style="border-color:${color}66" onclick="openEditModal('${ev.id}')" title="${catLabel}">${icon}</button>
+        ${ev.nextDay ? '<span class="ev-nextday-tag">🌙 +1</span>' : ''}
       </div>
       <div class="ev-content-col">
         <div class="ev-name-row">
           <div class="ev-name" contenteditable="true" onblur="updateName('${ev.id}',this)"
-            spellcheck="false">${escHtml(ev.name)}</div>
-          ${ev.highlight ? '<span class="ev-star">⭐</span>' : ''}
+            spellcheck="false">${escHtml(ev.name)}${ev.highlight ? ' <span class="ev-star">⭐</span>' : ''}</div>
+          <div class="event-actions">
+            <button class="btn-icon move-btn" onclick="moveEvent('${ev.id}',-1)" title="Mover arriba" ${isFirst ? 'disabled' : ''}>▲</button>
+            <button class="btn-icon move-btn" onclick="moveEvent('${ev.id}',1)" title="Mover abajo" ${isLast ? 'disabled' : ''}>▼</button>
+            <span class="drag-handle" title="Arrastrar">⠿</span>
+            <button class="btn-icon" onclick="openEditModal('${ev.id}')" title="Editar">✎</button>
+            <button class="btn-icon danger" onclick="deleteEvent('${ev.id}')" title="Eliminar">✕</button>
+          </div>
         </div>
         <div class="ev-meta">
           <span class="cat-badge ${badgeClass}">${catLabel}</span>
           ${ev.notes ? `<span class="ev-notes">${escHtml(ev.notes)}</span>` : ''}
         </div>
-      </div>
-      <div class="event-actions">
-        <button class="btn-icon move-btn" onclick="moveEvent('${ev.id}',-1)" title="Mover arriba" ${isFirst ? 'disabled' : ''}>▲</button>
-        <button class="btn-icon move-btn" onclick="moveEvent('${ev.id}',1)" title="Mover abajo" ${isLast ? 'disabled' : ''}>▼</button>
-        <span class="drag-handle" title="Arrastrar">⠿</span>
-        <button class="btn-icon" onclick="openEditModal('${ev.id}')" title="Editar">✎</button>
-        <button class="btn-icon danger" onclick="deleteEvent('${ev.id}')" title="Eliminar">✕</button>
       </div>
     </div>`;
   });
