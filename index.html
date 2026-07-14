@@ -1526,6 +1526,10 @@ async function createBin() {
 
   state.couple = { names, date, venue };
   state.events = freshDefaultEvents();
+  // Proveedor de ejemplo (igual que los "Ej:" en las notas de música):
+  // muestra el formato esperado, pero la pareja lo edita y lo reemplaza
+  // por sus propios proveedores.
+  state.providers = [{ id: uid(), name: 'Ej: Senén Redondo', service: 'Ej: Fotógrafo', phone: 'Ej: 304 568 3139', done: false, isExample: true }];
 
   try {
     const binId = await createBinRemote({ state, code: null });
@@ -2367,7 +2371,19 @@ function exportPDF(mode = 'print') {
   }
 
   // ── PROVEEDORES ──
-  if (Array.isArray(state.providers) && state.providers.length) {
+  // Regla especial SOLO para la fila precargada con mis datos (isExample):
+  // no entra al PDF salvo que la persona haya escrito encima del "Ej:" Y
+  // además la haya marcado con el check. El resto de proveedores que la
+  // pareja agregue se comportan como siempre (salen con badge Pendiente
+  // o Confirmado, sin este requisito extra).
+  const pdfProviders = (state.providers || []).filter(p => {
+    if (p.isExample) {
+      const stillPlaceholder = (p.name || '').trim().startsWith('Ej:');
+      return p.done && !stillPlaceholder;
+    }
+    return true;
+  });
+  if (pdfProviders.length) {
     y += 8;
     if (y > H - 40) { doc.addPage(); doc.setFillColor(251, 246, 239); doc.rect(0, 0, W, H, 'F'); y = isMobile ? 10 : 20; }
 
@@ -2384,7 +2400,7 @@ function exportPDF(mode = 'print') {
     doc.line(MARGIN, y, W - MARGIN, y);
     y += 8;
 
-    state.providers.forEach(p => {
+    pdfProviders.forEach(p => {
       if (y > H - 22) { doc.addPage(); doc.setFillColor(251, 246, 239); doc.rect(0, 0, W, H, 'F'); y = isMobile ? 10 : 20; }
 
       // Nombre
