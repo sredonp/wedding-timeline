@@ -544,6 +544,99 @@
   .notes-textarea:focus { border-color: var(--gold); background: #fff; }
   .notes-textarea::placeholder { color: var(--muted); opacity: .7; }
 
+  /* ── PROVEEDORES ── */
+  .providers-wrap { padding-top: 14px; }
+  .provider-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .provider-row:last-of-type { border-bottom: none; }
+  .provider-check {
+    width: 19px;
+    height: 19px;
+    margin-top: 8px;
+    accent-color: var(--gold);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .provider-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+  }
+  .provider-input {
+    width: 100%;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    color: var(--ink);
+    font-size: 13px;
+    font-family: var(--font-body);
+    padding: 8px 9px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .provider-input:focus { border-color: var(--gold); background: #fff; }
+  .provider-input:disabled {
+    background: transparent;
+    border-color: transparent;
+    color: var(--ink);
+    opacity: 0.85;
+    padding-left: 0;
+  }
+  .provider-row.is-done .provider-fields { grid-template-columns: 1fr 1fr auto; }
+  .provider-call-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 34px;
+    text-decoration: none;
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 13px;
+    gap: 4px;
+    border: 1px solid var(--gold);
+    border-radius: var(--radius-sm);
+    background: #fff;
+  }
+  .provider-remove-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 15px;
+    cursor: pointer;
+    padding: 6px 2px;
+    margin-top: 4px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .provider-remove-btn:hover { color: var(--plum); }
+  .provider-add-btn {
+    margin-top: 10px;
+    background: none;
+    border: 1px dashed var(--line);
+    border-radius: var(--radius-sm);
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 12px;
+    width: 100%;
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .provider-add-btn:hover { border-color: var(--gold); color: var(--gold); }
+  @media (max-width: 520px) {
+    .provider-fields { grid-template-columns: 1fr; }
+    .provider-row.is-done .provider-fields { grid-template-columns: 1fr 1fr; }
+  }
+
   /* ── BOTÓN FLOTANTE: AÑADIR MOMENTO ── */
   .fab-add {
     position: fixed;
@@ -1038,6 +1131,15 @@
     </div>
   </div>
 
+  <!-- PROVEEDORES -->
+  <div class="notes-wrap providers-wrap">
+    <div class="notes-card">
+      <div class="notes-title">📋 Proveedores</div>
+      <div id="providers-list"></div>
+      <button class="provider-add-btn" onclick="addProvider()">+ Agregar proveedor</button>
+    </div>
+  </div>
+
   <!-- TIMELINE -->
   <div class="timeline-wrap">
     <div id="timeline-list"></div>
@@ -1152,7 +1254,8 @@ const JSONBIN_BASE = 'https://boda-proxy.sredonp.workers.dev';
 let state = {
   couple: { names: '', date: '', venue: '' },
   events: [],
-  notes: ''
+  notes: '',
+  providers: []
 };
 
 // Garantiza que el estado siempre tenga la forma esperada, sin importar
@@ -1169,7 +1272,8 @@ function normalizeState(raw) {
       venue: couple.venue || ''
     },
     events: Array.isArray(r.events) ? r.events : [],
-    notes: typeof r.notes === 'string' ? r.notes : ''
+    notes: typeof r.notes === 'string' ? r.notes : '',
+    providers: Array.isArray(r.providers) ? r.providers : []
   };
 }
 let editingId = null;
@@ -1361,6 +1465,7 @@ function startPolling() {
         updateBanner();
         renderTimeline();
         refreshNotesField();
+        renderProviders();
         showToast('Sincronizado con cambios externos ↻');
       }
       lastRemoteHash = hash;
@@ -1381,6 +1486,7 @@ document.addEventListener('visibilitychange', async () => {
       updateBanner();
       renderTimeline();
       refreshNotesField();
+        renderProviders();
       showToast('Sincronizado con cambios externos ↻');
     }
     lastRemoteHash = hash;
@@ -1543,6 +1649,7 @@ function showApp() {
   renderTimeline();
   initSortable();
   document.getElementById('notes-textarea').value = state.notes || '';
+  renderProviders();
   setupFabAutoHide();
 }
 
@@ -1644,6 +1751,111 @@ function refreshNotesField() {
   const el = document.getElementById('notes-textarea');
   if (!el || document.activeElement === el) return;
   el.value = state.notes || '';
+}
+
+// ── PROVEEDORES ────────────────────────────────────────
+function addProvider() {
+  if (!Array.isArray(state.providers)) state.providers = [];
+  state.providers.push({ id: uid(), name: '', service: '', phone: '', done: false });
+  save();
+  renderProviders();
+  // Enfoca el primer campo vacío del nuevo proveedor
+  const rows = document.querySelectorAll('#providers-list .provider-row');
+  const last = rows[rows.length - 1];
+  const firstInput = last && last.querySelector('.provider-input');
+  if (firstInput) firstInput.focus();
+}
+
+function removeProvider(id) {
+  if (!confirm('¿Eliminar este proveedor?')) return;
+  state.providers = (state.providers || []).filter(p => p.id !== id);
+  save();
+  renderProviders();
+}
+
+let providerDebounce = {};
+function updateProviderField(id, field, value) {
+  const p = (state.providers || []).find(p => p.id === id);
+  if (!p) return;
+  p[field] = value;
+  clearTimeout(providerDebounce[id]);
+  providerDebounce[id] = setTimeout(() => { save(); }, 500);
+}
+
+function toggleProviderDone(id) {
+  const p = (state.providers || []).find(p => p.id === id);
+  if (!p) return;
+  p.done = !p.done;
+  save();
+  renderProviders();
+}
+
+// Construye una fila de proveedor de forma segura (sin innerHTML con datos
+// del usuario) para evitar cualquier inyección vía nombre/servicio/teléfono.
+function buildProviderRow(p) {
+  const row = document.createElement('div');
+  row.className = 'provider-row' + (p.done ? ' is-done' : '');
+
+  const check = document.createElement('input');
+  check.type = 'checkbox';
+  check.className = 'provider-check';
+  check.checked = !!p.done;
+  check.title = p.done ? 'Marcar como pendiente' : 'Confirmar datos';
+  check.onchange = () => toggleProviderDone(p.id);
+  row.appendChild(check);
+
+  const fields = document.createElement('div');
+  fields.className = 'provider-fields';
+
+  const nameInput = document.createElement('input');
+  nameInput.className = 'provider-input';
+  nameInput.placeholder = 'Nombre proveedor';
+  nameInput.value = p.name || '';
+  nameInput.disabled = !!p.done;
+  nameInput.oninput = () => updateProviderField(p.id, 'name', nameInput.value);
+  fields.appendChild(nameInput);
+
+  const serviceInput = document.createElement('input');
+  serviceInput.className = 'provider-input';
+  serviceInput.placeholder = 'Servicio';
+  serviceInput.value = p.service || '';
+  serviceInput.disabled = !!p.done;
+  serviceInput.oninput = () => updateProviderField(p.id, 'service', serviceInput.value);
+  fields.appendChild(serviceInput);
+
+  if (p.done) {
+    const callBtn = document.createElement('a');
+    callBtn.className = 'provider-call-btn';
+    callBtn.href = 'tel:' + (p.phone || '').replace(/[^0-9+]/g, '');
+    callBtn.textContent = '📞 ' + (p.phone || '');
+    fields.appendChild(callBtn);
+  } else {
+    const phoneInput = document.createElement('input');
+    phoneInput.className = 'provider-input';
+    phoneInput.placeholder = 'Teléfono';
+    phoneInput.type = 'tel';
+    phoneInput.value = p.phone || '';
+    phoneInput.oninput = () => updateProviderField(p.id, 'phone', phoneInput.value);
+    fields.appendChild(phoneInput);
+  }
+
+  row.appendChild(fields);
+
+  const removeBtn = document.createElement('button');
+  removeBtn.className = 'provider-remove-btn';
+  removeBtn.textContent = '✕';
+  removeBtn.title = 'Eliminar proveedor';
+  removeBtn.onclick = () => removeProvider(p.id);
+  row.appendChild(removeBtn);
+
+  return row;
+}
+
+function renderProviders() {
+  const list = document.getElementById('providers-list');
+  if (!list) return;
+  list.innerHTML = '';
+  (state.providers || []).forEach(p => list.appendChild(buildProviderRow(p)));
 }
 
 // ── RENDER ─────────────────────────────────────────────
@@ -2015,6 +2227,83 @@ function exportPDF() {
 
     y += 10;
   });
+
+  // ── NOTAS Y PENDIENTES ──
+  if (state.notes && state.notes.trim()) {
+    y += 6;
+    if (y > H - 40) { doc.addPage(); doc.setFillColor(251, 246, 239); doc.rect(0, 0, W, H, 'F'); y = 20; }
+
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'italic');
+    doc.setTextColor(75, 58, 82);
+    doc.text('📝 Notas y pendientes', 20, y);
+    doc.setFont(undefined, 'normal');
+    y += 3;
+    doc.setDrawColor(176, 141, 87);
+    doc.setLineWidth(0.3);
+    doc.line(20, y, W - 20, y);
+    y += 7;
+
+    doc.setFontSize(9);
+    doc.setTextColor(46, 36, 48);
+    const noteLines = doc.splitTextToSize(state.notes, W - 40);
+    noteLines.forEach(line => {
+      if (y > H - 20) { doc.addPage(); doc.setFillColor(251, 246, 239); doc.rect(0, 0, W, H, 'F'); y = 20; }
+      doc.text(line, 20, y);
+      y += 5.5;
+    });
+  }
+
+  // ── PROVEEDORES ──
+  if (Array.isArray(state.providers) && state.providers.length) {
+    y += 8;
+    if (y > H - 40) { doc.addPage(); doc.setFillColor(251, 246, 239); doc.rect(0, 0, W, H, 'F'); y = 20; }
+
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'italic');
+    doc.setTextColor(75, 58, 82);
+    doc.text('📋 Proveedores', 20, y);
+    doc.setFont(undefined, 'normal');
+    y += 3;
+    doc.setDrawColor(176, 141, 87);
+    doc.setLineWidth(0.3);
+    doc.line(20, y, W - 20, y);
+    y += 8;
+
+    state.providers.forEach(p => {
+      if (y > H - 22) { doc.addPage(); doc.setFillColor(251, 246, 239); doc.rect(0, 0, W, H, 'F'); y = 20; }
+
+      // Nombre
+      doc.setFontSize(10);
+      doc.setTextColor(46, 36, 48);
+      doc.text(p.name || 'Sin nombre', 20, y);
+
+      // Servicio
+      if (p.service) {
+        doc.setFontSize(8.5);
+        doc.setTextColor(139, 128, 120);
+        doc.setFont(undefined, 'italic');
+        doc.text(p.service, 20, y + 5);
+        doc.setFont(undefined, 'normal');
+      }
+
+      // Teléfono
+      doc.setFontSize(9);
+      doc.setTextColor(176, 141, 87);
+      doc.text(p.phone || '—', W - 20, y, { align: 'right' });
+
+      // Estado (confirmado / pendiente)
+      doc.setFontSize(7.5);
+      doc.setTextColor(p.done ? 124 : 201, p.done ? 139 : 123, p.done ? 111 : 132);
+      doc.text(p.done ? '✓ Confirmado' : '○ Pendiente', W - 20, y + 5, { align: 'right' });
+
+      y += 6;
+      doc.setDrawColor(228, 217, 200);
+      doc.setLineWidth(0.2);
+      doc.line(20, y, W - 20, y);
+      y += 8;
+    });
+  }
 
   // Footer
   doc.setFillColor(176, 141, 87);
