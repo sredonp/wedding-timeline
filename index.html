@@ -1040,7 +1040,7 @@
 
 <script>
 // ── CONSTANTS ──────────────────────────────────────────
-const JSONBIN_KEY = '$2a$10$Gbqmd3TmN8p9fTW6QaeU5ubJrmq/whcWGVIGAQXeZbymk4tsr68ie';
+const JSONBIN_KEY = '$2a$10$LicWfhmkFL3UuvqC3I1ZIe.8tpfEPZ.P492/hDHh.ACQiCMjuEuiy';
 const JSONBIN_BASE = 'https://api.jsonbin.io/v3';
 
 // ── STATE ──────────────────────────────────────────────
@@ -1141,9 +1141,11 @@ function loadLocal() {
 }
 
 // ── JSONBIN API ────────────────────────────────────────
+// Usamos una Access Key (no la Master Key) — solo tiene permiso sobre
+// la API de Bins (crear/leer/actualizar), no sobre el resto de la cuenta.
 function jsonbinHeaders(write = false) {
-  const h = { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_KEY };
-  if (write) h['X-Bin-Private'] = 'false'; // public so any device can read
+  const h = { 'Content-Type': 'application/json', 'X-Access-Key': JSONBIN_KEY };
+  if (write) h['X-Bin-Private'] = 'false'; // público para que cualquier dispositivo con el código pueda leer
   return h;
 }
 
@@ -1160,7 +1162,7 @@ async function createBinRemote(data) {
 
 async function readBinRemote(binId) {
   const res = await fetch(`${JSONBIN_BASE}/b/${binId}/latest`, {
-    headers: { 'X-Master-Key': JSONBIN_KEY }
+    headers: { 'X-Access-Key': JSONBIN_KEY }
   });
   if (!res.ok) throw new Error('Bin no encontrado: ' + res.status);
   const json = await res.json();
