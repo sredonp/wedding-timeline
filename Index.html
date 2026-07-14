@@ -1,0 +1,2022 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FBF6EF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mi Boda">
+<title>Programa del Día — @senenphotography</title>
+<link rel="manifest" href="#" id="manifest-placeholder">
+<link rel="apple-touch-icon" id="apple-icon-placeholder">
+<link rel="icon" id="icon-placeholder">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- jsPDF for PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- SortableJS for drag and drop -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+
+<style>
+  :root {
+    --ink:#2E2430;
+    --paper:#FBF6EF;
+    --card:#FFFEFB;
+    --rose:#C97B84;
+    --sage:#7C8B6F;
+    --plum:#4B3A52;
+    --gold:#B08D57;
+    --gold-light:#CBA875;
+    --line:#E4D9C8;
+    --muted:#8B8078;
+    --danger:#B5453D;
+    --radius:16px;
+    --radius-sm:9px;
+    --font-display:'Cormorant Garamond', serif;
+    --font-body:'Work Sans', sans-serif;
+
+    --cat-prep:#7C8B6F;
+    --cat-glam:#C97B84;
+    --cat-foto:#B08D57;
+    --cat-evento:#4B3A52;
+    --cat-fiesta:#8A6A9A;
+    --cat-other:#8B8078;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--paper);
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(201,123,132,0.08), transparent 40%),
+      radial-gradient(circle at 85% 92%, rgba(124,139,111,0.08), transparent 40%);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── SOCIAL / BRAND ── */
+  .social-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 1px solid var(--line);
+    color: var(--plum);
+    transition: all 0.15s;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  .social-btn svg { width: 16px; height: 16px; display: block; }
+  .social-btn:hover {
+    border-color: var(--rose);
+    color: var(--rose);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(201,123,132,.18);
+  }
+  .social-btn.sm { width: 30px; height: 30px; }
+  .social-btn.sm svg { width: 14px; height: 14px; }
+
+  .site-footer {
+    background: var(--card);
+    border-top: 1px solid var(--line);
+    padding: 30px 24px 38px;
+    text-align: center;
+  }
+  .site-footer .footer-brand {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 19px;
+    color: var(--plum);
+    margin-bottom: 4px;
+  }
+  .site-footer .footer-tag {
+    font-size: 11.5px;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+    margin-bottom: 16px;
+  }
+  .site-footer .social-bar { margin-bottom: 14px; }
+  .site-footer .footer-cta {
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .site-footer .footer-cta a {
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .site-footer .footer-cta a:hover { color: var(--rose); }
+
+  /* ── HEADER ── */
+  .header {
+    background: rgba(251,246,239,0.92);
+    border-bottom: 1px solid var(--line);
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--card);
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+  .brand-name {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--plum);
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+  }
+  .brand-sub {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn {
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    padding: 9px 16px;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--line);
+  }
+  .btn-ghost:hover { border-color: var(--rose); color: var(--rose); }
+  .btn-gold {
+    background: var(--plum);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(75,58,82,.18);
+  }
+  .btn-gold:hover { background: var(--rose); transform: translateY(-1px); }
+  .btn-accent {
+    background: rgba(201,123,132,0.12);
+    color: #A85C66;
+    border: 1px solid rgba(201,123,132,0.35);
+  }
+  .btn-accent:hover { background: rgba(201,123,132,0.22); }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  .btn-icon {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+  }
+  .btn-icon:hover { background: var(--line); color: var(--plum); }
+  .btn-icon.danger:hover { color: var(--danger); }
+  @media (hover: none) {
+    .btn-icon { padding: 9px; }
+  }
+
+  /* ── SETUP SCREEN ── */
+  .setup-screen {
+    min-height: calc(100vh - 60px);
+    min-height: calc(100dvh - 60px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .setup-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 44px 40px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(75,58,82,0.08);
+  }
+  .setup-hero {
+    font-size: 46px;
+    margin-bottom: 14px;
+  }
+  .setup-title {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 32px;
+    color: var(--plum);
+    margin-bottom: 8px;
+  }
+  .setup-sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 30px;
+    line-height: 1.6;
+  }
+  .setup-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    text-align: left;
+  }
+  .field-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .field-input {
+    width: 100%;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    color: var(--ink);
+    font-size: 16px;
+    font-family: var(--font-body);
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field-input:focus { border-color: var(--gold); background: #fff; }
+  .field-input::placeholder { color: var(--muted); opacity: .7; }
+  .setup-start {
+    margin-top: 22px;
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+    justify-content: center;
+  }
+
+  /* ── MAIN APP ── */
+  .app-wrap { display: none; }
+  .app-wrap.visible { display: block; }
+
+  /* ── COUPLE BANNER ── */
+  .couple-banner {
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+    padding: 26px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .couple-names {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 30px;
+    color: var(--plum);
+    line-height: 1.1;
+  }
+  .couple-names span { color: var(--rose); font-style: normal; }
+  .couple-date {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+    text-transform: capitalize;
+  }
+  .couple-actions {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .couple-actions .link-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 12.5px;
+    font-family: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    padding: 0;
+  }
+  .couple-actions .link-btn:hover { color: var(--rose); }
+
+  /* ── TIMELINE ── */
+  .timeline-wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 30px 20px 120px;
+  }
+
+  .phase-label {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--rose);
+    margin: 44px 0 6px 0;
+    padding-left: 2px;
+  }
+  .phase-label:first-of-type { margin-top: 6px; }
+
+  .event {
+    position: relative;
+    display: grid;
+    grid-template-columns: 92px 46px 1fr;
+    column-gap: 14px;
+    align-items: start;
+    padding: 14px 4px;
+    border-bottom: 1px dashed var(--line);
+    transition: background .15s;
+  }
+  .event:last-child { border-bottom: none; }
+  .event:hover { background: rgba(228,217,200,0.18); }
+  .event.highlighted { background: rgba(176,141,87,0.06); }
+  .event.highlighted::before {
+    content:"";
+    position:absolute; left:-2px; top:8px; bottom:8px; width:3px;
+    background: var(--gold); border-radius: 4px;
+  }
+
+  .ev-time-col { padding-top: 4px; cursor: pointer; }
+  .ev-time {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--ink);
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+    border-radius: 5px;
+    padding: 2px 4px;
+    margin-left: -4px;
+    display: inline-block;
+    transition: background .15s;
+  }
+  .ev-time-col:hover .ev-time { background: #F1E6D8; }
+  .ev-duration { font-size: 11px; color: var(--muted); margin-top: 5px; letter-spacing: .01em; }
+
+  .ev-icon-col { display: flex; justify-content: center; padding-top: 2px; }
+  .ev-icon-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--card);
+    border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; cursor: pointer;
+    box-shadow: 0 1px 3px rgba(75,58,82,.08);
+    transition: border-color .15s;
+    flex-shrink: 0;
+  }
+  .ev-icon-btn:hover { border-color: var(--rose); }
+
+  .ev-content-col { padding-top: 4px; padding-right: 96px; }
+  .ev-name-row { display: flex; align-items: center; gap: 8px; }
+  .ev-name {
+    font-size: 16.5px; font-weight: 500; color: var(--ink);
+    outline: none; line-height: 1.4; padding: 3px 6px; border-radius: 5px;
+    min-height: 1.4em; flex: 1;
+  }
+  .ev-name:hover { background: #F4EEE3; }
+  .ev-name:focus { background: #F1E6D8; }
+  .ev-star { color: var(--gold); font-size: 14px; flex-shrink: 0; }
+
+  .ev-meta {
+    font-size: 12px; color: var(--muted);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-top: 3px; padding: 0 6px;
+  }
+  .ev-notes { font-style: italic; color: var(--muted); }
+
+  .cat-badge {
+    font-size: 10px;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .b-prep   { background: rgba(124,139,111,0.15); color: #5b6b4f; }
+  .b-glam   { background: rgba(201,123,132,0.15); color: #a85c66; }
+  .b-foto   { background: rgba(176,141,87,0.15);  color: #8f7040; }
+  .b-evento { background: rgba(75,58,82,0.13);    color: #4b3a52; }
+  .b-fiesta { background: rgba(138,106,154,0.15); color: #6f4f7e; }
+  .b-other  { background: rgba(139,128,120,0.15); color: #6b625b; }
+
+  .event-actions {
+    position: absolute;
+    top: 14px;
+    right: 4px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    opacity: 0;
+    transition: opacity .15s;
+  }
+  .event:hover .event-actions { opacity: 1; }
+  /* En pantallas táctiles no existe :hover, así que mostramos los
+     botones de mover/editar/borrar siempre (más tenues), y ocultamos
+     la manija de arrastrar porque las flechas son más confiables al tacto */
+  @media (hover: none) {
+    .event-actions { opacity: .6; }
+    .drag-handle { display: none; }
+  }
+  .move-btn {
+    font-size: 11px;
+    padding: 5px 5px;
+    line-height: 1;
+  }
+  .move-btn:disabled { opacity: .25; cursor: default; }
+  .move-btn:disabled:hover { background: transparent; color: var(--muted); }
+  .drag-handle {
+    cursor: grab;
+    color: var(--line);
+    padding: 8px 6px;
+    font-size: 16px;
+  }
+  .drag-handle:active { cursor: grabbing; }
+
+  /* ── ADD BUTTON ── */
+  .add-btn-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 34px 0 8px;
+  }
+  .btn-add {
+    background: var(--plum);
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 30px;
+    cursor: pointer;
+    font-size: 13.5px;
+    letter-spacing: .02em;
+    font-family: var(--font-body);
+    font-weight: 600;
+    box-shadow: 0 6px 18px rgba(75,58,82,.22);
+    transition: .15s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-add:hover { background: var(--rose); transform: translateY(-1px); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(46,36,48,0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 28px;
+    width: 100%;
+    max-width: 440px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 60px rgba(75,58,82,0.22);
+  }
+  .modal-title {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 21px;
+    color: var(--plum);
+    margin-bottom: 20px;
+  }
+  .modal-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .modal-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .modal-footer {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+    justify-content: flex-end;
+  }
+  select.field-input {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238B8078' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .empty-state-icon { font-size: 44px; margin-bottom: 16px; opacity: .8; }
+  .empty-state h3 { font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: 20px; color: var(--plum); margin-bottom: 8px; }
+  .empty-state p { font-size: 13px; }
+
+  /* ── TIME PICKER (modal) ── */
+  .time-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+  }
+  .time-input-wrap:focus-within { border-color: var(--gold); }
+  .time-part {
+    width: 36px;
+    background: transparent;
+    border: none;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+    font-variant-numeric: tabular-nums;
+  }
+  .time-sep { color: var(--muted); font-size: 18px; font-weight: 600; }
+
+  .nextday-chip {
+    display: block;
+    margin-top: 8px;
+    font-size: 11.5px;
+    font-family: var(--font-body);
+    color: var(--muted);
+    background: none;
+    border: 1px dashed var(--line);
+    border-radius: 20px;
+    padding: 6px 12px;
+    cursor: pointer;
+    letter-spacing: .01em;
+    text-align: center;
+    width: 100%;
+    transition: all .15s;
+  }
+  .nextday-chip:hover { border-color: var(--rose); color: var(--rose); }
+  .nextday-chip.active {
+    color: var(--plum);
+    background: #F1E6D8;
+    border: 1px solid var(--gold);
+    font-weight: 600;
+  }
+
+  .ev-nextday-tag {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 10px;
+    color: var(--plum);
+    background: #F1E6D8;
+    border: 1px solid var(--gold);
+    border-radius: 20px;
+    padding: 1px 8px;
+    letter-spacing: .01em;
+  }
+
+  /* ── CARTEL DE INSTALACIÓN (PWA) ── */
+  .install-banner {
+    position: fixed;
+    left: 14px;
+    right: 14px;
+    bottom: 16px;
+    z-index: 999;
+    background: var(--card);
+    border: 1px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 12px 34px rgba(75,58,82,.22);
+    animation: installSlideUp 0.4s ease;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  @keyframes installSlideUp {
+    from { transform: translateY(120%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .install-banner .install-icon {
+    font-size: 1.7rem;
+    flex-shrink: 0;
+  }
+  .install-banner .install-text {
+    flex: 1;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .install-banner .install-text b {
+    color: var(--plum);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .install-banner .install-btn {
+    flex-shrink: 0;
+    background: var(--plum);
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    padding: 9px 16px;
+    font-weight: 600;
+    font-size: 12.5px;
+    font-family: var(--font-body);
+    cursor: pointer;
+  }
+  .install-banner .install-btn:hover { background: var(--rose); }
+  .install-banner .install-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 4px 6px;
+    line-height: 1;
+  }
+  .install-banner .install-close:hover { color: var(--rose); }
+  @media (max-width: 480px) {
+    .install-banner { flex-wrap: wrap; }
+    .install-banner .install-text { font-size: 12px; }
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--plum);
+    border: 1px solid var(--plum);
+    color: #fff;
+    border-radius: 30px;
+    padding: 12px 22px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 300;
+    opacity: 0;
+    transition: all 0.25s;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 10px 30px rgba(75,58,82,.25);
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.gold { background: var(--gold); border-color: var(--gold); }
+
+  /* ── SORTABLE ── */
+  .sortable-ghost { opacity: 0.35; }
+  .sortable-drag { opacity: 1 !important; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 480px) {
+    .header { padding: 12px 16px; }
+    .btn { padding: 7px 12px; font-size: 12px; }
+    .couple-banner { padding: 18px 16px; }
+    .couple-names { font-size: 24px; }
+    .timeline-wrap { padding: 20px 12px 100px; }
+    .setup-card { padding: 30px 22px; }
+    .brand-name { font-size: 13px; }
+    .modal { padding: 20px; }
+    .modal-row { grid-template-columns: 1fr; }
+    .event { grid-template-columns: 74px 40px 1fr; column-gap: 10px; }
+    .ev-time { font-size: 18px; }
+    .ev-icon-btn { width: 34px; height: 34px; font-size: 15px; }
+    .ev-content-col { padding-right: 80px; }
+  }
+
+  /* ── SETUP TABS ── */
+  .setup-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 30px;
+    padding: 4px;
+  }
+  .setup-tab {
+    flex: 1;
+    padding: 9px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 26px;
+    color: var(--muted);
+    font-size: 13px;
+    font-family: var(--font-body);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .setup-tab.active {
+    background: var(--plum);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* ── ACCESS CODE DISPLAY ── */
+  .access-code-display {
+    font-family: 'Courier New', monospace;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--plum);
+    background: var(--paper);
+    border: 2px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin: 0 auto 8px;
+    text-align: center;
+  }
+  .code-input {
+    font-family: 'Courier New', monospace;
+    font-size: 22px;
+    letter-spacing: 0.12em;
+    text-align: center;
+    font-weight: 700;
+    color: var(--plum);
+  }
+
+  /* ── SYNC BADGE ── */
+  .sync-badge {
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: default;
+    transition: all 0.3s;
+  }
+  .sync-badge.synced  { color: var(--sage); }
+  .sync-badge.syncing { color: var(--gold); }
+  .sync-badge.error   { color: var(--danger); }
+
+  /* ── PRINT / PDF ── */
+  @media print {
+    .header, .couple-actions, .event-actions, .add-btn-wrap,
+    .btn-add { display: none !important; }
+    body { background: #fff; }
+    .event:hover { background: none; }
+    .couple-names { color: var(--plum); }
+  }
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div class="setup-screen" id="setup-screen">
+  <div class="setup-card">
+    <div class="setup-hero">💍</div>
+    <h1 class="setup-title">Programa de tu boda</h1>
+    <p class="setup-sub">Organiza tu día especial y accede desde cualquier dispositivo.</p>
+
+    <!-- Tabs -->
+    <div class="setup-tabs">
+      <button class="setup-tab active" id="tab-new" onclick="switchTab('new')">✦ Crear nuevo</button>
+      <button class="setup-tab" id="tab-join" onclick="switchTab('join')">🔑 Tengo un código</button>
+    </div>
+
+    <!-- Tab: New -->
+    <div id="panel-new">
+      <div class="setup-fields">
+        <div>
+          <div class="field-label">Nombre(s) de los novios</div>
+          <input class="field-input" id="setup-names" type="text" placeholder="Ej: María &amp; Carlos" maxlength="60">
+        </div>
+        <div>
+          <div class="field-label">Fecha de la boda</div>
+          <input class="field-input" id="setup-date" type="date">
+        </div>
+        <div>
+          <div class="field-label">Lugar del evento (opcional)</div>
+          <input class="field-input" id="setup-venue" type="text" placeholder="Ej: Finca El Mirador, Barranquilla" maxlength="80">
+        </div>
+      </div>
+      <button class="btn btn-gold setup-start" id="btn-create" onclick="createBin()">Crear mi programa →</button>
+      <button class="btn btn-ghost setup-start" id="btn-cancel-edit" style="display:none;margin-top:8px" onclick="cancelEditInfo()">Cancelar</button>
+    </div>
+
+    <!-- Tab: Join -->
+    <div id="panel-join" style="display:none">
+      <div class="setup-fields">
+        <div>
+          <div class="field-label">Código de acceso</div>
+          <input class="field-input code-input" id="setup-code" type="text"
+            placeholder="Ej: ABC-7X2" maxlength="10"
+            oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9\-]/g,'')">
+          <p style="margin-top:8px;font-size:12px;color:var(--muted);">El código te lo dio quien creó el programa.</p>
+        </div>
+      </div>
+      <button class="btn btn-gold setup-start" id="btn-join" onclick="joinBin()">Acceder →</button>
+    </div>
+
+    <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--line);">
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">✦ Elaborado por <strong style="color:var(--gold)">@senenphotography</strong></p>
+      <div class="social-bar">
+        <a class="social-btn sm" href="https://www.instagram.com/senenphotography/" target="_blank" rel="noopener" title="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a class="social-btn sm" href="https://wa.me/573045683139" target="_blank" rel="noopener" title="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.2-.6.9-.8 1.1-.1.2-.3.2-.5.1-1.4-.7-2.4-1.3-3.3-2.9-.1-.2 0-.4.1-.5.2-.2.4-.5.6-.7.1-.2.1-.4 0-.6-.1-.2-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4-.2 0-.4 0-.6 0-.2 0-.5.1-.7.4-.2.3-.9 1-.9 2.3 0 1.4 1 2.7 1.1 2.9.1.2 1.9 3 4.6 4.1 2.3.9 2.7.7 3.2.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.1.2-1.2-.1-.1-.3-.1-.6-.2zM12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C4 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ACCESS CODE MODAL -->
+<div class="modal-overlay" id="code-modal">
+  <div class="modal" style="text-align:center;max-width:380px">
+    <div style="font-size:40px;margin-bottom:12px">🎉</div>
+    <div class="modal-title" style="font-size:24px">¡Programa creado!</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">
+      Guarda este código. Cualquier persona con él puede ver y editar tu programa desde cualquier dispositivo.
+    </p>
+    <div class="access-code-display" id="access-code-display">---</div>
+    <button class="btn btn-ghost" style="width:100%;margin-top:8px;justify-content:center" onclick="copyCode()">
+      📋 Copiar código
+    </button>
+    <button class="btn btn-gold" style="width:100%;margin-top:10px;justify-content:center" onclick="dismissCodeModal()">
+      Continuar →
+    </button>
+    <p style="margin-top:14px;font-size:11px;color:var(--muted)">
+      También puedes compartir el link directo desde el menú ⋯
+    </p>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app-wrap" id="app-wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <a class="brand" href="https://www.instagram.com/senenphotography/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;" title="Ver Instagram">
+      <div class="brand-icon">✦</div>
+      <div>
+        <div class="brand-name">@senenphotography</div>
+        <div class="brand-sub">Programa del evento</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <a class="social-btn sm" href="https://wa.me/573045683139" target="_blank" rel="noopener" title="WhatsApp">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.2-.6.9-.8 1.1-.1.2-.3.2-.5.1-1.4-.7-2.4-1.3-3.3-2.9-.1-.2 0-.4.1-.5.2-.2.4-.5.6-.7.1-.2.1-.4 0-.6-.1-.2-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4-.2 0-.4 0-.6 0-.2 0-.5.1-.7.4-.2.3-.9 1-.9 2.3 0 1.4 1 2.7 1.1 2.9.1.2 1.9 3 4.6 4.1 2.3.9 2.7.7 3.2.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.1.2-1.2-.1-.1-.3-.1-.6-.2zM12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C4 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg>
+      </a>
+      <a class="social-btn sm" href="https://www.instagram.com/senenphotography/" target="_blank" rel="noopener" title="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <span class="sync-badge" id="sync-badge" title="Estado de sincronización">●</span>
+      <button class="btn btn-ghost btn-sm" onclick="showShareModal()" title="Compartir código">🔗</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportPDF()">⬇ PDF</button>
+      <button class="btn btn-accent btn-sm" onclick="openAddModal()">+ Momento</button>
+    </div>
+  </div>
+
+  <!-- COUPLE BANNER -->
+  <div class="couple-banner">
+    <div>
+      <div class="couple-names" id="couple-names-display">— &amp; —</div>
+      <div class="couple-date" id="couple-date-display"></div>
+      <div class="couple-date" id="couple-venue-display" style="color:var(--muted);font-size:12px;margin-top:2px;"></div>
+    </div>
+    <div class="couple-actions">
+      <button class="link-btn" onclick="resetApp()">✎ Editar info</button>
+      <button class="link-btn" onclick="clearAll()">⊘ Limpiar todo</button>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="timeline-wrap">
+    <div id="timeline-list"></div>
+    <div class="add-btn-wrap">
+      <button class="btn-add" onclick="openAddModal()">
+        <span style="font-size:16px;line-height:1">+</span> Añadir momento
+      </button>
+    </div>
+  </div>
+
+  <!-- FOOTER / BRAND -->
+  <div class="site-footer">
+    <div class="footer-brand">✦ Sénen Photography</div>
+    <div class="footer-tag">Fotografía de bodas en Colombia</div>
+    <div class="social-bar">
+      <a class="social-btn" href="https://www.instagram.com/senenphotography/" target="_blank" rel="noopener" title="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a class="social-btn" href="https://wa.me/573045683139" target="_blank" rel="noopener" title="WhatsApp">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.2-.6.9-.8 1.1-.1.2-.3.2-.5.1-1.4-.7-2.4-1.3-3.3-2.9-.1-.2 0-.4.1-.5.2-.2.4-.5.6-.7.1-.2.1-.4 0-.6-.1-.2-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4-.2 0-.4 0-.6 0-.2 0-.5.1-.7.4-.2.3-.9 1-.9 2.3 0 1.4 1 2.7 1.1 2.9.1.2 1.9 3 4.6 4.1 2.3.9 2.7.7 3.2.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.1.2-1.2-.1-.1-.3-.1-.6-.2zM12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C4 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg>
+      </a>
+    </div>
+    <div class="footer-cta">¿Buscas fotógrafo para tu boda? <a href="https://wa.me/573045683139" target="_blank" rel="noopener">Escríbenos por WhatsApp</a></div>
+  </div>
+
+</div>
+
+<!-- SHARE MODAL -->
+<div class="modal-overlay" id="share-modal">
+  <div class="modal" style="text-align:center;max-width:380px">
+    <div class="modal-title">🔗 Compartir programa</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+      Usa este código para acceder desde cualquier dispositivo o compártelo con tu equipo.
+    </p>
+    <div class="access-code-display" id="share-code-display">---</div>
+    <button class="btn btn-ghost" style="width:100%;margin-top:8px;justify-content:center" onclick="copyCode()">
+      📋 Copiar código
+    </button>
+    <button class="btn btn-ghost" style="width:100%;margin-top:8px;justify-content:center" onclick="copyLink()">
+      🌐 Copiar link directo
+    </button>
+    <button class="btn btn-gold" style="width:100%;margin-top:10px;justify-content:center" onclick="closeShareModal()">
+      Cerrar
+    </button>
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Añadir momento</div>
+    <div class="modal-fields">
+      <div>
+        <div class="field-label">Nombre del momento</div>
+        <input class="field-input" id="ev-name" type="text" placeholder="Ej: Hora loca" maxlength="80">
+      </div>
+      <div>
+        <div class="field-label">Hora de inicio</div>
+        <div class="time-input-wrap">
+          <input class="time-part" id="ev-hours" type="number" inputmode="numeric" min="0" max="23" placeholder="HH" value="08">
+          <span class="time-sep">:</span>
+          <input class="time-part" id="ev-minutes" type="number" inputmode="numeric" min="0" max="59" placeholder="MM" value="00">
+        </div>
+        <button type="button" class="nextday-chip" id="ev-nextday-chip" onclick="toggleNextDay()">+ Es de madrugada del día siguiente</button>
+      </div>
+      <div class="modal-row">
+        <div>
+          <div class="field-label">Duración (minutos)</div>
+          <input class="field-input" id="ev-duration" type="number" inputmode="numeric" min="5" max="480" step="5" placeholder="30" value="30">
+        </div>
+        <div>
+          <div class="field-label">Categoría</div>
+          <select class="field-input" id="ev-category">
+            <option value="prep">🏠 Preparación</option>
+            <option value="glam">💄 Belleza</option>
+            <option value="foto">📷 Fotografía</option>
+            <option value="evento">💒 Ceremonia</option>
+            <option value="fiesta">🎉 Fiesta</option>
+            <option value="other">📌 Otro</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <div class="field-label">Notas (opcional)</div>
+        <input class="field-input" id="ev-notes" type="text" placeholder="Detalles adicionales..." maxlength="120">
+      </div>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:4px 0">
+        <input type="checkbox" id="ev-highlight" style="width:16px;height:16px;accent-color:var(--gold)">
+        <span style="font-size:13px;color:var(--muted)">⭐ Destacar este momento</span>
+      </label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-gold" onclick="saveEvent()">Guardar momento</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="install-banner" class="install-banner" style="display:none;"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONSTANTS ──────────────────────────────────────────
+const JSONBIN_KEY = '$2a$10$LicWfhmkFL3UuvqC3I1ZIe.8tpfEPZ.P492/hDHh.ACQiCMjuEuiy';
+const JSONBIN_BASE = 'https://api.jsonbin.io/v3';
+
+// ── STATE ──────────────────────────────────────────────
+let state = {
+  couple: { names: '', date: '', venue: '' },
+  events: []
+};
+let editingId = null;
+let pendingNextDay = false; // whether the event being added/edited is in the early hours of the next day
+let currentBinId = null;   // JSONBin bin ID (raw)
+let currentCode = null;    // human-readable code (e.g. ABC-7X2)
+let syncPending = false;
+let syncDebounce = null;
+let pollingInterval = null;
+let lastRemoteHash = null;
+
+const CAT_COLORS = {
+  prep: '#7C8B6F', glam: '#C97B84', foto: '#B08D57',
+  evento: '#4B3A52', fiesta: '#8A6A9A', other: '#8B8078'
+};
+const CAT_LABELS = {
+  prep: 'Preparación', glam: 'Belleza', foto: 'Fotografía',
+  evento: 'Ceremonia', fiesta: 'Fiesta', other: 'Otro'
+};
+const CAT_ICONS = {
+  prep: '🏠', glam: '💄', foto: '📷',
+  evento: '💒', fiesta: '🎉', other: '📌'
+};
+
+// ── PROGRAMA BASE (precargado en cada boda nueva) ──────
+const DEFAULT_EVENTS = [
+  { name:'Despertarse, ducharse',          hour:8,  minute:0,  duration:40,  cat:'prep',   notes:'', highlight:false },
+  { name:'Desayunar',                      hour:8,  minute:40, duration:30,  cat:'prep',   notes:'', highlight:false },
+  { name:'Peluquería y maquillaje',        hour:9,  minute:10, duration:120, cat:'glam',   notes:'', highlight:false },
+  { name:'A vestirse',                     hour:11, minute:10, duration:30,  cat:'glam',   notes:'', highlight:false },
+  { name:'Almuerzo ligero',                hour:11, minute:40, duration:95,  cat:'prep',   notes:'', highlight:false },
+  { name:'Llega el fotógrafo',             hour:13, minute:15, duration:15,  cat:'foto',   notes:'', highlight:false },
+  { name:'Sesión de fotos',                hour:13, minute:30, duration:60,  cat:'foto',   notes:'', highlight:false },
+  { name:'Fotos con la familia',           hour:14, minute:30, duration:15,  cat:'foto',   notes:'', highlight:false },
+  { name:'Llegan los invitados',           hour:14, minute:45, duration:15,  cat:'evento', notes:'', highlight:false },
+  { name:'Llega la limusina',              hour:15, minute:0,  duration:30,  cat:'evento', notes:'', highlight:false },
+  { name:'Entrada a la ceremonia',         hour:15, minute:30, duration:30,  cat:'evento', notes:'', highlight:false },
+  { name:'¡Sí, quiero!',                   hour:16, minute:0,  duration:15,  cat:'evento', notes:'', highlight:true  },
+  { name:'Cóctel y fotos',                 hour:16, minute:15, duration:20,  cat:'foto',   notes:'', highlight:false },
+  { name:'Vamos a la celebración',         hour:16, minute:35, duration:40,  cat:'evento', notes:'', highlight:false },
+  { name:'Entrada triunfal',               hour:17, minute:15, duration:20,  cat:'fiesta', notes:'', highlight:false },
+  { name:'Primer baile',                   hour:17, minute:35, duration:25,  cat:'fiesta', notes:'', highlight:true  },
+  { name:'Cena',                           hour:18, minute:0,  duration:40,  cat:'evento', notes:'', highlight:false },
+  { name:'¡Brindis!',                      hour:18, minute:40, duration:40,  cat:'evento', notes:'', highlight:false },
+  { name:'¡Fiesta!',                       hour:19, minute:20, duration:100, cat:'fiesta', notes:'', highlight:false },
+  { name:'Cortamos el pastel',             hour:21, minute:0,  duration:60,  cat:'fiesta', notes:'', highlight:true  },
+  { name:'Fuegos artificiales y clausura', hour:22, minute:0,  duration:30,  cat:'fiesta', notes:'', highlight:false },
+  { name:'¡Gran salida! Vamos a la cama :)', hour:22, minute:30, duration:30, cat:'fiesta', notes:'', highlight:false },
+];
+
+function freshDefaultEvents() {
+  // clona el programa base con ids nuevos, para que cada boda tenga su propia copia
+  return DEFAULT_EVENTS.map((ev, i) => ({ id: uid(), order: i, ...ev }));
+}
+
+const SECTION_BREAKS = [
+  { from: 0,  label: 'Madrugada' },
+  { from: 6,  label: 'Mañana — preparación' },
+  { from: 12, label: 'Tarde' },
+  { from: 18, label: 'Noche — recepción' },
+  { from: 22, label: 'Noche — fiesta' },
+];
+
+// ── CODE ↔ BIN ID ──────────────────────────────────────
+// We store a mapping of code → binId in localStorage as a local directory.
+// The bin itself holds the canonical wedding data.
+function codeFromBinId(binId) {
+  // Convert last 6 hex chars to readable code like "A3F-9B2"
+  const seg = binId.slice(-6).toUpperCase();
+  return seg.slice(0,3) + '-' + seg.slice(3);
+}
+
+function saveLocal() {
+  try {
+    localStorage.setItem('boda_pwa_v3', JSON.stringify({
+      state, binId: currentBinId, code: currentCode
+    }));
+  } catch(e) {}
+}
+
+function loadLocal() {
+  try {
+    const d = localStorage.getItem('boda_pwa_v3');
+    if (d) {
+      const parsed = JSON.parse(d);
+      state = parsed.state || state;
+      currentBinId = parsed.binId || null;
+      currentCode  = parsed.code  || null;
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+// ── JSONBIN API ────────────────────────────────────────
+// Usamos una Access Key (no la Master Key) — solo tiene permiso sobre
+// la API de Bins (crear/leer/actualizar), no sobre el resto de la cuenta.
+function jsonbinHeaders(write = false) {
+  const h = { 'Content-Type': 'application/json', 'X-Access-Key': JSONBIN_KEY };
+  if (write) h['X-Bin-Private'] = 'false'; // público para que cualquier dispositivo con el código pueda leer
+  return h;
+}
+
+async function createBinRemote(data) {
+  const res = await fetch(`${JSONBIN_BASE}/b`, {
+    method: 'POST',
+    headers: { ...jsonbinHeaders(true), 'X-Bin-Name': 'boda-' + Date.now() },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) throw new Error('No se pudo crear el bin: ' + res.status);
+  const json = await res.json();
+  return json.metadata.id;
+}
+
+async function readBinRemote(binId) {
+  const res = await fetch(`${JSONBIN_BASE}/b/${binId}/latest`, {
+    headers: { 'X-Access-Key': JSONBIN_KEY }
+  });
+  if (!res.ok) throw new Error('Bin no encontrado: ' + res.status);
+  const json = await res.json();
+  return json.record;
+}
+
+async function updateBinRemote(binId, data) {
+  const res = await fetch(`${JSONBIN_BASE}/b/${binId}`, {
+    method: 'PUT',
+    headers: jsonbinHeaders(),
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) throw new Error('Error al guardar: ' + res.status);
+}
+
+function getBinIdFromCode(code) {
+  // Try localStorage directory first
+  try {
+    const dir = JSON.parse(localStorage.getItem('boda_dir_v3') || '{}');
+    if (dir[code]) return dir[code];
+  } catch(e) {}
+  return null;
+}
+
+function saveBinIdForCode(code, binId) {
+  try {
+    const dir = JSON.parse(localStorage.getItem('boda_dir_v3') || '{}');
+    dir[code] = binId;
+    localStorage.setItem('boda_dir_v3', JSON.stringify(dir));
+  } catch(e) {}
+}
+
+// ── SYNC STATUS ────────────────────────────────────────
+function setSyncStatus(status, text) {
+  const badge = document.getElementById('sync-badge');
+  if (!badge) return;
+  badge.className = 'sync-badge ' + status;
+  badge.title = text;
+  badge.textContent = status === 'syncing' ? '⟳' : status === 'synced' ? '✓' : '✕';
+}
+
+// ── SAVE (debounced cloud sync) ────────────────────────
+async function save() {
+  saveLocal();
+  if (!currentBinId) return;
+  clearTimeout(syncDebounce);
+  syncDebounce = setTimeout(async () => {
+    setSyncStatus('syncing', 'Guardando...');
+    try {
+      await updateBinRemote(currentBinId, { state, code: currentCode });
+      setSyncStatus('synced', 'Guardado en la nube ✓');
+    } catch(e) {
+      setSyncStatus('error', 'Error al guardar. Revisa tu conexión.');
+    }
+  }, 800);
+}
+
+// ── POLLING (live sync every 15s) ─────────────────────
+function startPolling() {
+  if (pollingInterval) clearInterval(pollingInterval);
+  pollingInterval = setInterval(async () => {
+    if (!currentBinId) return;
+    if (document.hidden) return; // pausa si el celular está en segundo plano
+    try {
+      const remote = await readBinRemote(currentBinId);
+      const hash = JSON.stringify(remote.state);
+      if (lastRemoteHash && hash !== lastRemoteHash) {
+        // Remote changed — update local state
+        state = remote.state;
+        saveLocal();
+        updateBanner();
+        renderTimeline();
+        showToast('Sincronizado con cambios externos ↻');
+      }
+      lastRemoteHash = hash;
+    } catch(e) { /* silent */ }
+  }, 15000);
+}
+
+// Al volver del segundo plano (cambiar de app, bloquear pantalla, etc.)
+// forzamos una sincronización inmediata en vez de esperar el próximo tick.
+document.addEventListener('visibilitychange', async () => {
+  if (document.hidden || !currentBinId) return;
+  try {
+    const remote = await readBinRemote(currentBinId);
+    const hash = JSON.stringify(remote.state);
+    if (lastRemoteHash && hash !== lastRemoteHash) {
+      state = remote.state;
+      saveLocal();
+      updateBanner();
+      renderTimeline();
+      showToast('Sincronizado con cambios externos ↻');
+    }
+    lastRemoteHash = hash;
+  } catch(e) { /* silent */ }
+});
+
+// ── TAB SWITCH ─────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('tab-new').classList.toggle('active', tab === 'new');
+  document.getElementById('tab-join').classList.toggle('active', tab === 'join');
+  document.getElementById('panel-new').style.display = tab === 'new' ? '' : 'none';
+  document.getElementById('panel-join').style.display = tab === 'join' ? '' : 'none';
+}
+
+// ── CREATE NEW BIN ─────────────────────────────────────
+async function createBin() {
+  const names = document.getElementById('setup-names').value.trim();
+  const date  = document.getElementById('setup-date').value;
+  const venue = document.getElementById('setup-venue').value.trim();
+  if (!names) { showToast('Por favor ingresa los nombres 💍'); return; }
+
+  const btn = document.getElementById('btn-create');
+  btn.disabled = true;
+  btn.textContent = 'Creando...';
+
+  state.couple = { names, date, venue };
+  state.events = freshDefaultEvents();
+
+  try {
+    const binId = await createBinRemote({ state, code: null });
+    currentBinId = binId;
+    currentCode  = codeFromBinId(binId);
+
+    // Update bin with code embedded
+    await updateBinRemote(binId, { state, code: currentCode });
+    saveBinIdForCode(currentCode, binId);
+    saveLocal();
+
+    // Update URL hash for direct linking
+    window.location.hash = currentCode;
+
+    // Show code modal
+    document.getElementById('access-code-display').textContent = currentCode;
+    document.getElementById('code-modal').classList.add('open');
+
+    lastRemoteHash = JSON.stringify(state);
+    startPolling();
+  } catch(e) {
+    showToast('Error al crear: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = 'Crear mi programa →';
+  }
+}
+
+// ── JOIN WITH CODE ─────────────────────────────────────
+async function joinBin() {
+  const code = document.getElementById('setup-code').value.trim().toUpperCase();
+  if (!code || code.length < 6) { showToast('Ingresa un código válido'); return; }
+
+  const btn = document.getElementById('btn-join');
+  btn.disabled = true;
+  btn.textContent = 'Buscando...';
+
+  let binId = getBinIdFromCode(code);
+
+  if (!binId) {
+    const params = new URLSearchParams(window.location.search);
+    const urlBinId = params.get('b');
+    if (urlBinId) {
+      const urlCode = codeFromBinId(urlBinId);
+      if (urlCode === code) {
+        binId = urlBinId;
+        saveBinIdForCode(code, binId);
+      }
+    }
+  }
+
+  if (!binId) {
+    showToast('Código no encontrado en este dispositivo. Usa el link directo.');
+    btn.disabled = false;
+    btn.textContent = 'Acceder →';
+    return;
+  }
+
+  try {
+    const remote = await readBinRemote(binId);
+    state = remote.state || { couple: {}, events: [] };
+    currentBinId = binId;
+    currentCode  = code;
+    saveBinIdForCode(code, binId);
+    saveLocal();
+    window.location.hash = code;
+    lastRemoteHash = JSON.stringify(state);
+    startPolling();
+    showApp();
+    showToast('¡Conectado! ✓', true);
+  } catch(e) {
+    showToast('No se pudo acceder. Verifica el código o el link.');
+    btn.disabled = false;
+    btn.textContent = 'Acceder →';
+  }
+}
+
+// ── DISMISS CODE MODAL ─────────────────────────────────
+function dismissCodeModal() {
+  document.getElementById('code-modal').classList.remove('open');
+  showApp();
+}
+
+// ── SHARE MODAL ────────────────────────────────────────
+function showShareModal() {
+  document.getElementById('share-code-display').textContent = currentCode || '---';
+  document.getElementById('share-modal').classList.add('open');
+}
+function closeShareModal() {
+  document.getElementById('share-modal').classList.remove('open');
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(currentCode || '').then(() => showToast('Código copiado ✓'));
+}
+
+function copyLink() {
+  const url = `${location.origin}${location.pathname}?b=${currentBinId}#${currentCode}`;
+  navigator.clipboard.writeText(url).then(() => showToast('Link copiado ✓'));
+}
+
+// ── INIT ───────────────────────────────────────────────
+(async function init() {
+  const params = new URLSearchParams(window.location.search);
+  const urlBinId = params.get('b');
+  const urlCode  = window.location.hash.replace('#','').toUpperCase();
+
+  if (urlBinId && urlCode) {
+    saveBinIdForCode(urlCode, urlBinId);
+    currentBinId = urlBinId;
+    currentCode  = urlCode;
+    try {
+      const remote = await readBinRemote(urlBinId);
+      state = remote.state || { couple: {}, events: [] };
+      saveLocal();
+      lastRemoteHash = JSON.stringify(state);
+      startPolling();
+      showApp();
+      showToast('Programa cargado ✓', true);
+      return;
+    } catch(e) { /* fall through to setup */ }
+  }
+
+  const restored = loadLocal();
+  if (restored && currentBinId && state.couple.names) {
+    try {
+      const remote = await readBinRemote(currentBinId);
+      state = remote.state || state;
+      saveLocal();
+    } catch(e) { /* use local */ }
+    lastRemoteHash = JSON.stringify(state);
+    startPolling();
+    showApp();
+    return;
+  }
+
+  document.getElementById('setup-date').valueAsDate = new Date();
+})();
+
+function showApp() {
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app-wrap').classList.add('visible');
+  setSyncStatus('synced', 'Sincronizado');
+  updateBanner();
+  renderTimeline();
+  initSortable();
+}
+
+function resetApp() {
+  document.getElementById('setup-screen').style.display = 'flex';
+  document.getElementById('app-wrap').classList.remove('visible');
+  document.getElementById('setup-names').value = state.couple.names;
+  document.getElementById('setup-date').value = state.couple.date;
+  document.getElementById('setup-venue').value = state.couple.venue;
+
+  const btn = document.getElementById('btn-create');
+  const cancelBtn = document.getElementById('btn-cancel-edit');
+  if (currentBinId) {
+    btn.textContent = 'Guardar cambios →';
+    btn.onclick = saveEditedInfo;
+    if (cancelBtn) cancelBtn.style.display = '';
+  } else {
+    btn.textContent = 'Crear mi programa →';
+    btn.onclick = createBin;
+    if (cancelBtn) cancelBtn.style.display = 'none';
+  }
+}
+
+async function saveEditedInfo() {
+  const names = document.getElementById('setup-names').value.trim();
+  const date  = document.getElementById('setup-date').value;
+  const venue = document.getElementById('setup-venue').value.trim();
+  if (!names) { showToast('Por favor ingresa los nombres 💍'); return; }
+
+  state.couple = { names, date, venue };
+  await save();
+  showApp();
+  showToast('Información actualizada ✓', true);
+}
+
+function cancelEditInfo() {
+  showApp();
+}
+
+function clearAll() {
+  if (!confirm('¿Eliminar todos los momentos? Esta acción no se puede deshacer.')) return;
+  state.events = [];
+  save();
+  renderTimeline();
+  showToast('Momentos eliminados');
+}
+
+// ── BANNER ─────────────────────────────────────────────
+function updateBanner() {
+  const { names, date, venue } = state.couple;
+  document.getElementById('couple-names-display').innerHTML =
+    names.includes('&') || names.includes('y')
+      ? names.replace(/(&|y)/g, '<span>$1</span>')
+      : `<span>${names}</span>`;
+
+  if (date) {
+    const d = new Date(date + 'T00:00:00');
+    document.getElementById('couple-date-display').textContent =
+      d.toLocaleDateString('es-CO', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  }
+  document.getElementById('couple-venue-display').textContent = venue || '';
+}
+
+// ── RENDER ─────────────────────────────────────────────
+function fmtTime(h, m) {
+  return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+}
+function fmtDur(min) {
+  if (min < 60) return min + ' min';
+  const h = Math.floor(min/60), rm = min%60;
+  return rm ? `${h}h ${rm}min` : `${h}h`;
+}
+function minutesOf(ev) {
+  return (ev.hour + (ev.nextDay ? 24 : 0)) * 60 + ev.minute;
+}
+function getSectionLabel(ev) {
+  if (ev.nextDay) return 'Ya de madrugada · día siguiente';
+  let label = null;
+  for (const s of SECTION_BREAKS) {
+    if (ev.hour >= s.from) label = s.label;
+    else break;
+  }
+  return label;
+}
+
+let sortable = null;
+function initSortable() {
+  const list = document.getElementById('timeline-list');
+  if (sortable) sortable.destroy();
+  sortable = Sortable.create(list, {
+    animation: 150,
+    handle: '.drag-handle',
+    ghostClass: 'sortable-ghost',
+    dragClass: 'sortable-drag',
+    onEnd(evt) {
+      const moved = state.events.splice(evt.oldIndex, 1)[0];
+      state.events.splice(evt.newIndex, 0, moved);
+      renumberOrder();
+      save();
+      renderTimeline();
+    }
+  });
+}
+
+// Reasigna el campo "order" según la posición actual en el arreglo (0,1,2,...)
+function renumberOrder() {
+  state.events.forEach((ev, i) => { ev.order = i; });
+}
+
+// Mueve un momento un puesto hacia arriba o abajo (más confiable que arrastrar en móvil)
+function moveEvent(id, direction) {
+  const idx = state.events.findIndex(e => e.id === id);
+  if (idx === -1) return;
+  const targetIdx = idx + direction;
+  if (targetIdx < 0 || targetIdx >= state.events.length) return;
+  const tmp = state.events[idx];
+  state.events[idx] = state.events[targetIdx];
+  state.events[targetIdx] = tmp;
+  renumberOrder();
+  save();
+  renderTimeline();
+}
+
+function renderTimeline() {
+  const list = document.getElementById('timeline-list');
+  // El orden se controla manualmente (campo "order"), no se reordena por hora
+  // en cada render — así que mover un momento hacia arriba/abajo se mantiene.
+  const sorted = [...state.events].sort((a,b) => (a.order ?? 0) - (b.order ?? 0));
+  state.events = sorted;
+
+  if (!state.events.length) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">📋</div>
+        <h3>No hay momentos aún</h3>
+        <p>Añade el primer momento de tu gran día</p>
+      </div>`;
+    return;
+  }
+
+  let html = '';
+  let lastSection = null;
+
+  state.events.forEach((ev, i) => {
+    const section = getSectionLabel(ev);
+    if (section !== lastSection) {
+      lastSection = section;
+      html += `<div class="phase-label">${section}</div>`;
+    }
+    const color = CAT_COLORS[ev.cat] || CAT_COLORS.other;
+    const icon = CAT_ICONS[ev.cat] || CAT_ICONS.other;
+    const badgeClass = 'b-' + ev.cat;
+    const catLabel = CAT_LABELS[ev.cat] || 'Otro';
+    const highlighted = ev.highlight ? 'highlighted' : '';
+    const isFirst = i === 0;
+    const isLast = i === state.events.length - 1;
+
+    html += `
+    <div class="event ${highlighted}" data-id="${ev.id}">
+      <div class="ev-time-col" onclick="quickEditTime('${ev.id}')">
+        <div class="ev-time">${fmtTime(ev.hour, ev.minute)}</div>
+        <div class="ev-duration">${fmtDur(ev.duration)}</div>
+        ${ev.nextDay ? '<span class="ev-nextday-tag">🌙 día siguiente</span>' : ''}
+      </div>
+      <div class="ev-icon-col">
+        <button class="ev-icon-btn" type="button" style="border-color:${color}66" onclick="openEditModal('${ev.id}')" title="${catLabel}">${icon}</button>
+      </div>
+      <div class="ev-content-col">
+        <div class="ev-name-row">
+          <div class="ev-name" contenteditable="true" onblur="updateName('${ev.id}',this)"
+            spellcheck="false">${escHtml(ev.name)}</div>
+          ${ev.highlight ? '<span class="ev-star">⭐</span>' : ''}
+        </div>
+        <div class="ev-meta">
+          <span class="cat-badge ${badgeClass}">${catLabel}</span>
+          ${ev.notes ? `<span class="ev-notes">${escHtml(ev.notes)}</span>` : ''}
+        </div>
+      </div>
+      <div class="event-actions">
+        <button class="btn-icon move-btn" onclick="moveEvent('${ev.id}',-1)" title="Mover arriba" ${isFirst ? 'disabled' : ''}>▲</button>
+        <button class="btn-icon move-btn" onclick="moveEvent('${ev.id}',1)" title="Mover abajo" ${isLast ? 'disabled' : ''}>▼</button>
+        <span class="drag-handle" title="Arrastrar">⠿</span>
+        <button class="btn-icon" onclick="openEditModal('${ev.id}')" title="Editar">✎</button>
+        <button class="btn-icon danger" onclick="deleteEvent('${ev.id}')" title="Eliminar">✕</button>
+      </div>
+    </div>`;
+  });
+
+  list.innerHTML = html;
+  initSortable();
+}
+
+function escHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── EVENTS CRUD ────────────────────────────────────────
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+function updateNextDayChip() {
+  const chip = document.getElementById('ev-nextday-chip');
+  if (!chip) return;
+  chip.classList.toggle('active', pendingNextDay);
+  chip.textContent = pendingNextDay
+    ? '🌙 Es de madrugada · día siguiente'
+    : '+ Es de madrugada del día siguiente';
+}
+
+function toggleNextDay() {
+  pendingNextDay = !pendingNextDay;
+  updateNextDayChip();
+}
+
+function openAddModal() {
+  editingId = null;
+  pendingNextDay = false;
+  document.getElementById('modal-title').textContent = 'Añadir momento';
+  document.getElementById('ev-name').value = '';
+  document.getElementById('ev-hours').value = '08';
+  document.getElementById('ev-minutes').value = '00';
+  document.getElementById('ev-duration').value = '30';
+  document.getElementById('ev-category').value = 'prep';
+  document.getElementById('ev-notes').value = '';
+  document.getElementById('ev-highlight').checked = false;
+  updateNextDayChip();
+  document.getElementById('modal').classList.add('open');
+  setTimeout(() => document.getElementById('ev-name').focus(), 100);
+}
+
+function openEditModal(id) {
+  const ev = state.events.find(e => e.id === id);
+  if (!ev) return;
+  editingId = id;
+  pendingNextDay = !!ev.nextDay;
+  document.getElementById('modal-title').textContent = 'Editar momento';
+  document.getElementById('ev-name').value = ev.name;
+  document.getElementById('ev-hours').value = String(ev.hour).padStart(2,'0');
+  document.getElementById('ev-minutes').value = String(ev.minute).padStart(2,'0');
+  document.getElementById('ev-duration').value = ev.duration;
+  document.getElementById('ev-category').value = ev.cat;
+  document.getElementById('ev-notes').value = ev.notes || '';
+  document.getElementById('ev-highlight').checked = !!ev.highlight;
+  updateNextDayChip();
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  editingId = null;
+}
+
+function saveEvent() {
+  const name = document.getElementById('ev-name').value.trim();
+  if (!name) { showToast('El nombre no puede estar vacío'); return; }
+  const hour = Math.max(0, Math.min(23, parseInt(document.getElementById('ev-hours').value) || 0));
+  const minute = Math.max(0, Math.min(59, parseInt(document.getElementById('ev-minutes').value) || 0));
+  const duration = Math.max(5, parseInt(document.getElementById('ev-duration').value) || 30);
+  const cat = document.getElementById('ev-category').value;
+  const notes = document.getElementById('ev-notes').value.trim();
+  const highlight = document.getElementById('ev-highlight').checked;
+  const nextDay = pendingNextDay;
+
+  if (editingId) {
+    const idx = state.events.findIndex(e => e.id === editingId);
+    if (idx !== -1) state.events[idx] = { ...state.events[idx], name, hour, minute, duration, cat, notes, highlight, nextDay };
+  } else {
+    const newEvent = { id: uid(), name, hour, minute, duration, cat, notes, highlight, nextDay };
+    // Inserta el momento nuevo en la posición cronológica que le corresponde
+    // (el orden manual de los demás momentos no se altera)
+    const newMinutes = minutesOf(newEvent);
+    let insertAt = state.events.findIndex(ev => minutesOf(ev) > newMinutes);
+    if (insertAt === -1) insertAt = state.events.length;
+    state.events.splice(insertAt, 0, newEvent);
+  }
+  renumberOrder();
+  save();
+  closeModal();
+  renderTimeline();
+  showToast(editingId ? 'Momento actualizado ✓' : 'Momento añadido ✓');
+}
+
+function deleteEvent(id) {
+  if (!confirm('¿Eliminar este momento?')) return;
+  state.events = state.events.filter(e => e.id !== id);
+  save();
+  renderTimeline();
+  showToast('Momento eliminado');
+}
+
+function updateName(id, el) {
+  const ev = state.events.find(e => e.id === id);
+  if (!ev) return;
+  ev.name = el.textContent.trim() || ev.name;
+  save();
+}
+
+function quickEditTime(id) {
+  openEditModal(id);
+  setTimeout(() => document.getElementById('ev-hours').focus(), 150);
+}
+
+// ── TOAST ──────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, gold = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (gold ? ' gold' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = 'toast', 2500);
+}
+
+// ── PDF EXPORT ─────────────────────────────────────────
+function exportPDF() {
+  if (!state.events.length) { showToast('Añade momentos primero'); return; }
+  showToast('Generando PDF...', true);
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = 210, H = 297;
+
+  // Background
+  doc.setFillColor(251, 246, 239);
+  doc.rect(0, 0, W, H, 'F');
+
+  // Gold header bar
+  doc.setFillColor(176, 141, 87);
+  doc.rect(0, 0, W, 18, 'F');
+
+  // Header text
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(9);
+  doc.text('@senenphotography', 10, 11);
+  doc.setFontSize(9);
+  doc.text('Programa del evento', W - 10, 11, { align: 'right' });
+
+  // Couple names
+  doc.setTextColor(75, 58, 82);
+  doc.setFontSize(22);
+  doc.text(state.couple.names || 'Los Novios', W/2, 36, { align: 'center' });
+
+  if (state.couple.date) {
+    const d = new Date(state.couple.date + 'T00:00:00');
+    doc.setFontSize(10);
+    doc.setTextColor(139, 128, 120);
+    doc.text(d.toLocaleDateString('es-CO', { weekday:'long', year:'numeric', month:'long', day:'numeric' }), W/2, 44, { align: 'center' });
+  }
+
+  if (state.couple.venue) {
+    doc.setFontSize(9);
+    doc.setTextColor(139, 128, 120);
+    doc.text(state.couple.venue, W/2, 51, { align: 'center' });
+  }
+
+  // Divider
+  doc.setDrawColor(176, 141, 87);
+  doc.setLineWidth(0.3);
+  doc.line(20, 55, W - 20, 55);
+
+  // Events
+  const CAT_RGB = {
+    prep: [124,139,111], glam: [201,123,132], foto: [176,141,87],
+    evento: [75,58,82], fiesta: [138,106,154], other: [139,128,120]
+  };
+
+  let y = 63;
+  let lastSec = null;
+  const pdfEvents = [...state.events].sort((a,b) => minutesOf(a) - minutesOf(b));
+
+  pdfEvents.forEach((ev, i) => {
+    const sec = getSectionLabel(ev);
+    if (sec !== lastSec) {
+      lastSec = sec;
+      if (y > 63) y += 4;
+      doc.setFontSize(7);
+      doc.setTextColor(201, 123, 132);
+      doc.text(sec.toUpperCase(), 20, y);
+      doc.setDrawColor(228, 217, 200);
+      doc.setLineWidth(0.2);
+      doc.line(55, y - 1, W - 20, y - 1);
+      y += 7;
+    }
+
+    if (y > H - 30) {
+      doc.addPage();
+      doc.setFillColor(251, 246, 239);
+      doc.rect(0, 0, W, H, 'F');
+      y = 20;
+    }
+
+    const rgb = CAT_RGB[ev.cat] || CAT_RGB.other;
+
+    // Dot
+    doc.setFillColor(...rgb);
+    doc.circle(22, y - 1, 1.5, 'F');
+
+    // Time
+    doc.setFontSize(8);
+    doc.setTextColor(46, 36, 48);
+    doc.text(fmtTime(ev.hour, ev.minute), 28, y);
+
+    // Name
+    doc.setFontSize(10);
+    if (ev.highlight) {
+      doc.setTextColor(176, 141, 87);
+    } else {
+      doc.setTextColor(46, 36, 48);
+    }
+    doc.text(ev.name + (ev.nextDay ? '  🌙' : ''), 52, y);
+
+    // Duration
+    doc.setFontSize(8);
+    doc.setTextColor(139, 128, 120);
+    doc.text(fmtDur(ev.duration), W - 20, y, { align: 'right' });
+
+    // Notes
+    if (ev.notes) {
+      y += 5;
+      doc.setFontSize(7);
+      doc.setTextColor(139, 128, 120);
+      doc.setFont(undefined, 'italic');
+      doc.text(ev.notes, 52, y);
+      doc.setFont(undefined, 'normal');
+    }
+
+    // Connector line
+    if (i < pdfEvents.length - 1) {
+      doc.setDrawColor(228, 217, 200);
+      doc.setLineWidth(0.3);
+      doc.line(22, y + 2, 22, y + 8);
+    }
+
+    y += 10;
+  });
+
+  // Footer
+  doc.setFillColor(176, 141, 87);
+  doc.rect(0, H - 14, W, 14, 'F');
+  doc.setFontSize(7.5);
+  doc.setTextColor(255, 255, 255);
+  doc.text('Creado con amor por @senenphotography · Fotografía de bodas en Colombia', W/2, H - 8, { align: 'center' });
+  doc.setFontSize(7);
+  doc.text('IG: @senenphotography   ·   WhatsApp: +57 304 568 3139', W/2, H - 3.5, { align: 'center' });
+
+  const fname = `programa-boda-${(state.couple.names || 'novios').replace(/[^a-z0-9]/gi,'_').toLowerCase()}.pdf`;
+  doc.save(fname);
+  showToast('PDF descargado ✓', true);
+}
+
+// ── KEYBOARD ───────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if ((e.key === 'Enter') && document.getElementById('modal').classList.contains('open')) {
+    const active = document.activeElement;
+    if (active && active.tagName !== 'TEXTAREA') saveEvent();
+  }
+});
+
+// Close modal on overlay click
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+// Fix time input formatting (y evita valores fuera de rango, ej. 99:99)
+document.getElementById('ev-hours').addEventListener('blur', function() {
+  let v = Math.max(0, Math.min(23, parseInt(this.value) || 0));
+  this.value = String(v).padStart(2,'0');
+});
+document.getElementById('ev-minutes').addEventListener('blur', function() {
+  let v = Math.max(0, Math.min(59, parseInt(this.value) || 0));
+  this.value = String(v).padStart(2,'0');
+});
+
+// ── ÍCONO DE LA APP (generado con canvas, para pantalla de inicio) ──
+function generateAppIcon(size) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  // Fondo color papel
+  ctx.fillStyle = '#FBF6EF';
+  ctx.fillRect(0, 0, size, size);
+  // Anillo dorado
+  ctx.strokeStyle = '#B08D57';
+  ctx.lineWidth = size * 0.045;
+  ctx.beginPath();
+  ctx.arc(size/2, size/2, size * 0.44, 0, Math.PI * 2);
+  ctx.stroke();
+  // Símbolo central
+  ctx.font = `${Math.round(size * 0.5)}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('💍', size/2, size/2 + size * 0.04);
+  return canvas.toDataURL('image/png');
+}
+const iconLarge = generateAppIcon(192);
+const iconSmall = generateAppIcon(96);
+document.getElementById('apple-icon-placeholder').setAttribute('href', iconLarge);
+document.getElementById('icon-placeholder').setAttribute('href', iconSmall);
+
+// PWA install manifest inline
+const manifest = {
+  name: "Programa de Boda",
+  short_name: "Mi Boda",
+  description: "Organizador de timeline de boda por @senenphotography",
+  start_url: "./",
+  display: "standalone",
+  background_color: "#FBF6EF",
+  theme_color: "#FBF6EF",
+  icons: [
+    { src: iconSmall, sizes: "96x96", type: "image/png" },
+    { src: iconLarge, sizes: "192x192", type: "image/png" }
+  ]
+};
+const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+document.getElementById('manifest-placeholder').href = URL.createObjectURL(blob);
+
+// ── CARTEL DE INSTALACIÓN (PWA) ─────────────────────────
+(function setupInstallBanner() {
+  const STORAGE_KEY = 'boda_install_dismissed';
+  const banner = document.getElementById('install-banner');
+  if (!banner) return;
+
+  // Si ya está instalada (abierta como app) o el usuario ya cerró el cartel, no mostrar nada
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (isStandalone || localStorage.getItem(STORAGE_KEY) === '1') return;
+
+  const ua = window.navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  const isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS/.test(ua);
+
+  let deferredPrompt = null;
+
+  function dismiss() {
+    banner.style.display = 'none';
+    localStorage.setItem(STORAGE_KEY, '1');
+  }
+
+  function showBanner(html) {
+    banner.innerHTML = html;
+    banner.style.display = 'flex';
+    const closeBtn = document.getElementById('install-close-btn');
+    if (closeBtn) closeBtn.addEventListener('click', dismiss);
+  }
+
+  // Android / Chrome: esperar el evento nativo de instalación
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    setTimeout(() => {
+      if (localStorage.getItem(STORAGE_KEY) === '1') return;
+      showBanner(`
+        <span class="install-icon">📲</span>
+        <span class="install-text"><b>Instala esta app</b><br>Accede a tu programa desde la pantalla de inicio.</span>
+        <button class="install-btn" id="install-action-btn">Instalar</button>
+        <button class="install-close" id="install-close-btn">✕</button>
+      `);
+      const actionBtn = document.getElementById('install-action-btn');
+      if (actionBtn) {
+        actionBtn.addEventListener('click', async () => {
+          banner.style.display = 'none';
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            await deferredPrompt.userChoice;
+            deferredPrompt = null;
+          }
+          localStorage.setItem(STORAGE_KEY, '1');
+        });
+      }
+    }, 1500);
+  });
+
+  // iPhone/iPad en Safari: no existe instalación automática, mostrar instrucciones
+  if (isIOS && isSafari) {
+    setTimeout(() => {
+      if (localStorage.getItem(STORAGE_KEY) === '1') return;
+      showBanner(`
+        <span class="install-icon">📲</span>
+        <span class="install-text"><b>Instala esta app</b><br>Toca <b>Compartir</b> ⬆️ y luego <b>"Agregar a pantalla de inicio"</b>.</span>
+        <button class="install-close" id="install-close-btn">✕</button>
+      `);
+    }, 1500);
+  }
+})();
+</script>
+</body>
+</html>
