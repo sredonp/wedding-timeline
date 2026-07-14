@@ -29,7 +29,6 @@
     --sage:#7C8B6F;
     --plum:#4B3A52;
     --gold:#B08D57;
-    --gold-light:#CBA875;
     --line:#E4D9C8;
     --muted:#8B8078;
     --danger:#B5453D;
@@ -38,12 +37,7 @@
     --font-display:'Cormorant Garamond', serif;
     --font-body:'Work Sans', sans-serif;
 
-    --cat-prep:#7C8B6F;
-    --cat-glam:#C97B84;
-    --cat-foto:#B08D57;
-    --cat-evento:#4B3A52;
-    --cat-fiesta:#8A6A9A;
-    --cat-other:#8B8078;
+    /* colores de categoría usados en JS como valores hex directos */
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -550,7 +544,6 @@
     overflow: hidden;
     line-height: 1.5;
     transition: border-color 0.15s;
-    field-sizing: content;
   }
   .notes-textarea:focus { border-color: var(--gold); background: #fff; }
   .notes-textarea::placeholder { color: var(--muted); opacity: .7; }
@@ -911,7 +904,8 @@
   /* ── RESPONSIVE ── */
   @media (max-width: 480px) {
     .header { padding: 12px 16px; }
-    .btn { padding: 7px 12px; font-size: 12px; }
+    /* .btn se maneja en el bloque @media (max-width: 430px) de arriba
+       con valores más ajustados — no redefinir aquí para evitar conflicto. */
     .couple-banner { padding: 18px 16px; }
     .couple-names { font-size: 24px; }
     .timeline-wrap { padding: 20px 12px 110px; }
@@ -1429,6 +1423,8 @@ async function readBinRemote(binId) {
 }
 
 async function updateBinRemote(binId, data) {
+  // X-Bin-Private solo aplica en creación (POST), no en actualización (PUT).
+  // jsonbinHeaders() sin write=true es correcto aquí.
   const res = await fetch(`${JSONBIN_BASE}/b/${binId}`, {
     method: 'PUT',
     headers: jsonbinHeaders(),
@@ -1462,34 +1458,13 @@ async function save() {
   }, 800);
 }
 
-// ── POLLING (live sync every 15s) ─────────────────────
-function startPolling() {
-  if (pollingInterval) clearInterval(pollingInterval);
-  pollingInterval = setInterval(async () => {
-    if (!currentBinId) return;
-    if (document.hidden) return; // pausa si el celular está en segundo plano
-    try {
-      const remote = await readBinRemote(currentBinId);
-      const hash = JSON.stringify(remote.state);
-      if (lastRemoteHash && hash !== lastRemoteHash) {
-        // Remote changed — update local state
-        state = normalizeState(remote.state);
-        saveLocal();
-        updateBanner();
-        renderTimeline();
-        refreshNotesField();
-        renderProviders();
-        showToast('Sincronizado con cambios externos ↻');
-      }
-      lastRemoteHash = hash;
-    } catch(e) { /* silent */ }
-  }, 15000);
-}
+// ── POLLING (live sync) ──────────────────────────────────────────────────────
+// Lógica de sync compartida entre el polling y el handler de visibilidad.
+let pollFailCount = 0;
+const POLL_MAX_INTERVAL = 120000; // 2 min máx entre reintentos
 
-// Al volver del segundo plano (cambiar de app, bloquear pantalla, etc.)
-// forzamos una sincronización inmediata en vez de esperar el próximo tick.
-document.addEventListener('visibilitychange', async () => {
-  if (document.hidden || !currentBinId) return;
+async function syncFromRemote() {
+  if (!currentBinId) return;
   try {
     const remote = await readBinRemote(currentBinId);
     const hash = JSON.stringify(remote.state);
@@ -1499,11 +1474,35 @@ document.addEventListener('visibilitychange', async () => {
       updateBanner();
       renderTimeline();
       refreshNotesField();
-        renderProviders();
+      renderProviders();
       showToast('Sincronizado con cambios externos ↻');
     }
     lastRemoteHash = hash;
-  } catch(e) { /* silent */ }
+    pollFailCount = 0; // resetear backoff en éxito
+  } catch(e) {
+    pollFailCount++; // backoff exponencial: el delay crece en schedulePoll
+  }
+}
+
+function schedulePoll() {
+  if (pollingInterval) clearTimeout(pollingInterval);
+  // Backoff: 15s base, se duplica por cada fallo hasta POLL_MAX_INTERVAL
+  const delay = Math.min(15000 * Math.pow(2, pollFailCount), POLL_MAX_INTERVAL);
+  pollingInterval = setTimeout(async () => {
+    if (!document.hidden) await syncFromRemote();
+    schedulePoll();
+  }, delay);
+}
+
+function startPolling() {
+  pollFailCount = 0;
+  schedulePoll();
+}
+
+// Al volver del segundo plano, sincronizamos de inmediato sin esperar el timer.
+document.addEventListener('visibilitychange', async () => {
+  if (document.hidden || !currentBinId) return;
+  await syncFromRemote();
 });
 
 // ── TAB SWITCH ─────────────────────────────────────────
@@ -1915,7 +1914,7 @@ function minutesOf(ev) {
 }
 function getSectionLabel(ev) {
   if (ev.nextDay) return 'Ya de madrugada · día siguiente';
-  let label = null;
+  let label = 'Mañana — preparación'; // fallback seguro si ningún breakpoint coincide
   for (const s of SECTION_BREAKS) {
     if (ev.hour >= s.from) label = s.label;
     else break;
@@ -1932,9 +1931,13 @@ function initSortable() {
     handle: '.drag-handle',
     ghostClass: 'sortable-ghost',
     dragClass: 'sortable-drag',
-    onEnd(evt) {
-      const moved = state.events.splice(evt.oldIndex, 1)[0];
-      state.events.splice(evt.newIndex, 0, moved);
+    onEnd() {
+      // Leemos los data-id del DOM en vez de usar evt.oldIndex/newIndex,
+      // porque esos índices cuentan todos los hijos del contenedor
+      // (incluidas las etiquetas de sección) y no coinciden con state.events.
+      const items = list.querySelectorAll('.event[data-id]');
+      const newOrder = Array.from(items).map(el => el.dataset.id);
+      state.events.sort((a, b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
       renumberOrder();
       save();
       renderTimeline();
@@ -1963,10 +1966,10 @@ function moveEvent(id, direction) {
 
 function renderTimeline() {
   const list = document.getElementById('timeline-list');
-  // El orden se controla manualmente (campo "order"), no se reordena por hora
-  // en cada render — así que mover un momento hacia arriba/abajo se mantiene.
+  // Ordenamos una copia local, SIN mutar state.events dentro de render.
+  // Mutar el array aquí causaba efectos secundarios cuando renderTimeline se
+  // llamaba desde el polling remoto mientras el usuario estaba editando.
   const sorted = [...state.events].sort((a,b) => (a.order ?? 0) - (b.order ?? 0));
-  state.events = sorted;
 
   if (!state.events.length) {
     list.innerHTML = `
@@ -1981,7 +1984,7 @@ function renderTimeline() {
   let html = '';
   let lastSection = null;
 
-  state.events.forEach((ev, i) => {
+  sorted.forEach((ev, i) => {
     const section = getSectionLabel(ev);
     if (section !== lastSection) {
       lastSection = section;
@@ -1993,7 +1996,7 @@ function renderTimeline() {
     const catLabel = CAT_LABELS[ev.cat] || 'Otro';
     const highlighted = ev.highlight ? 'highlighted' : '';
     const isFirst = i === 0;
-    const isLast = i === state.events.length - 1;
+    const isLast = i === sorted.length - 1;
 
     html += `
     <div class="event ${highlighted}" data-id="${ev.id}">
@@ -2111,9 +2114,10 @@ function saveEvent() {
   }
   renumberOrder();
   save();
+  const wasEditing = !!editingId; // capturar antes de que closeModal lo resetee a null
   closeModal();
   renderTimeline();
-  showToast(editingId ? 'Momento actualizado ✓' : 'Momento añadido ✓');
+  showToast(wasEditing ? 'Momento actualizado ✓' : 'Momento añadido ✓');
 }
 
 function deleteEvent(id) {
@@ -2127,7 +2131,16 @@ function deleteEvent(id) {
 function updateName(id, el) {
   const ev = state.events.find(e => e.id === id);
   if (!ev) return;
-  ev.name = el.textContent.trim() || ev.name;
+  const newName = el.textContent.trim();
+  if (!newName) {
+    // Si el usuario borra todo, revertimos al nombre anterior para no quedar en blanco
+    el.textContent = ev.name;
+    return;
+  }
+  ev.name = newName;
+  // Sincronizamos el textContent para que el siguiente renderTimeline
+  // (por polling remoto) no pise lo que el usuario acaba de escribir
+  el.textContent = ev.name;
   save();
 }
 
@@ -2149,11 +2162,14 @@ function showToast(msg, gold = false) {
 // ── PDF EXPORT ─────────────────────────────────────────
 // Elimina emojis y chars fuera de Latin-1 que Helvetica no puede renderizar
 function pdfSafe(str) {
-  return (str || "").replace(/[\u{1F000}-\u{1FFFF}]/gu, "")
-                    .replace(/[\u{2600}-\u{27FF}]/gu, "")
-                    .replace(/[\u{1F300}-\u{1F9FF}]/gu, "")
-                    .replace(/[^\x00-\xFF]/g, "")
-                    .trim();
+  return (str || "")
+    .replace(/[\u{1F000}-\u{1FFFF}]/gu, "")   // emojis y símbolos misceláneos altos
+    .replace(/[\u{2600}-\u{27FF}]/gu, "")      // símbolos, dingbats
+    .replace(/[\u{1F300}-\u{1F9FF}]/gu, "")   // emojis adicionales
+    .replace(/[\uFE00-\uFE0F]/g, "")           // variantes de presentación de emoji (U+FE00–FE0F)
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")    // zero-width chars y BOM
+    .replace(/[^\x00-\xFF]/g, "")              // cualquier otro carácter fuera de Latin-1
+    .trim();
 }
 
 function exportPDF(mode = 'print') {
