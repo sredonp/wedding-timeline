@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#FBF6EF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -412,7 +412,7 @@
   }
   .ev-icon-btn:hover { border-color: var(--rose); }
 
-  .ev-content-col { padding-top: 4px; padding-right: 60px; }
+  .ev-content-col { padding-top: 4px; padding-right: 96px; }
   .ev-name-row { display: flex; align-items: center; gap: 8px; }
   .ev-name {
     font-size: 16.5px; font-weight: 500; color: var(--ink);
@@ -450,16 +450,26 @@
     top: 14px;
     right: 4px;
     display: flex;
-    gap: 2px;
+    align-items: center;
+    gap: 0;
     opacity: 0;
     transition: opacity .15s;
   }
   .event:hover .event-actions { opacity: 1; }
   /* En pantallas táctiles no existe :hover, así que mostramos los
-     botones de arrastrar/editar/borrar siempre (más tenues) */
+     botones de mover/editar/borrar siempre (más tenues), y ocultamos
+     la manija de arrastrar porque las flechas son más confiables al tacto */
   @media (hover: none) {
-    .event-actions { opacity: .55; }
+    .event-actions { opacity: .6; }
+    .drag-handle { display: none; }
   }
+  .move-btn {
+    font-size: 11px;
+    padding: 5px 5px;
+    line-height: 1;
+  }
+  .move-btn:disabled { opacity: .25; cursor: default; }
+  .move-btn:disabled:hover { background: transparent; color: var(--muted); }
   .drag-handle {
     cursor: grab;
     color: var(--line);
@@ -732,7 +742,7 @@
     .event { grid-template-columns: 74px 40px 1fr; column-gap: 10px; }
     .ev-time { font-size: 18px; }
     .ev-icon-btn { width: 34px; height: 34px; font-size: 15px; }
-    .ev-content-col { padding-right: 46px; }
+    .ev-content-col { padding-right: 80px; }
   }
 
   /* ── SETUP TABS ── */
@@ -1098,7 +1108,7 @@ const DEFAULT_EVENTS = [
 
 function freshDefaultEvents() {
   // clona el programa base con ids nuevos, para que cada boda tenga su propia copia
-  return DEFAULT_EVENTS.map(ev => ({ id: uid(), ...ev }));
+  return DEFAULT_EVENTS.map((ev, i) => ({ id: uid(), order: i, ...ev }));
 }
 
 const SECTION_BREAKS = [
@@ -1522,15 +1532,37 @@ function initSortable() {
     onEnd(evt) {
       const moved = state.events.splice(evt.oldIndex, 1)[0];
       state.events.splice(evt.newIndex, 0, moved);
+      renumberOrder();
       save();
       renderTimeline();
     }
   });
 }
 
+// Reasigna el campo "order" según la posición actual en el arreglo (0,1,2,...)
+function renumberOrder() {
+  state.events.forEach((ev, i) => { ev.order = i; });
+}
+
+// Mueve un momento un puesto hacia arriba o abajo (más confiable que arrastrar en móvil)
+function moveEvent(id, direction) {
+  const idx = state.events.findIndex(e => e.id === id);
+  if (idx === -1) return;
+  const targetIdx = idx + direction;
+  if (targetIdx < 0 || targetIdx >= state.events.length) return;
+  const tmp = state.events[idx];
+  state.events[idx] = state.events[targetIdx];
+  state.events[targetIdx] = tmp;
+  renumberOrder();
+  save();
+  renderTimeline();
+}
+
 function renderTimeline() {
   const list = document.getElementById('timeline-list');
-  const sorted = [...state.events].sort((a,b) => minutesOf(a) - minutesOf(b));
+  // El orden se controla manualmente (campo "order"), no se reordena por hora
+  // en cada render — así que mover un momento hacia arriba/abajo se mantiene.
+  const sorted = [...state.events].sort((a,b) => (a.order ?? 0) - (b.order ?? 0));
   state.events = sorted;
 
   if (!state.events.length) {
@@ -1557,6 +1589,8 @@ function renderTimeline() {
     const badgeClass = 'b-' + ev.cat;
     const catLabel = CAT_LABELS[ev.cat] || 'Otro';
     const highlighted = ev.highlight ? 'highlighted' : '';
+    const isFirst = i === 0;
+    const isLast = i === state.events.length - 1;
 
     html += `
     <div class="event ${highlighted}" data-id="${ev.id}">
@@ -1580,6 +1614,8 @@ function renderTimeline() {
         </div>
       </div>
       <div class="event-actions">
+        <button class="btn-icon move-btn" onclick="moveEvent('${ev.id}',-1)" title="Mover arriba" ${isFirst ? 'disabled' : ''}>▲</button>
+        <button class="btn-icon move-btn" onclick="moveEvent('${ev.id}',1)" title="Mover abajo" ${isLast ? 'disabled' : ''}>▼</button>
         <span class="drag-handle" title="Arrastrar">⠿</span>
         <button class="btn-icon" onclick="openEditModal('${ev.id}')" title="Editar">✎</button>
         <button class="btn-icon danger" onclick="deleteEvent('${ev.id}')" title="Eliminar">✕</button>
@@ -1665,8 +1701,15 @@ function saveEvent() {
     const idx = state.events.findIndex(e => e.id === editingId);
     if (idx !== -1) state.events[idx] = { ...state.events[idx], name, hour, minute, duration, cat, notes, highlight, nextDay };
   } else {
-    state.events.push({ id: uid(), name, hour, minute, duration, cat, notes, highlight, nextDay });
+    const newEvent = { id: uid(), name, hour, minute, duration, cat, notes, highlight, nextDay };
+    // Inserta el momento nuevo en la posición cronológica que le corresponde
+    // (el orden manual de los demás momentos no se altera)
+    const newMinutes = minutesOf(newEvent);
+    let insertAt = state.events.findIndex(ev => minutesOf(ev) > newMinutes);
+    if (insertAt === -1) insertAt = state.events.length;
+    state.events.splice(insertAt, 0, newEvent);
   }
+  renumberOrder();
   save();
   closeModal();
   renderTimeline();
