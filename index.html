@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#FBF6EF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -74,6 +74,10 @@
     transition: all 0.15s;
     text-decoration: none;
     flex-shrink: 0;
+    cursor: pointer;
+    font-size: 15px;
+    font-family: inherit;
+    padding: 0;
   }
   .social-btn svg { width: 16px; height: 16px; display: block; }
   .social-btn:hover {
@@ -176,13 +180,9 @@
     align-items: center;
     justify-content: center;
     flex-wrap: nowrap;
-    gap: 6px;
+    gap: 8px;
     width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
   }
-  .header-actions::-webkit-scrollbar { display: none; }
   .btn {
     border: none;
     border-radius: 30px;
@@ -200,7 +200,6 @@
   }
   @media (max-width: 430px) {
     .btn { font-size: 11.5px; padding: 8px 10px; gap: 4px; }
-    .header-actions { gap: 5px; }
   }
   .btn-ghost {
     background: transparent;
@@ -1105,9 +1104,9 @@
       <a class="social-btn" href="https://www.instagram.com/senenphotography/" target="_blank" rel="noopener" title="Instagram">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
       </a>
-      <button class="btn btn-ghost" onclick="showShareModal()" title="Compartir código">🔗 Compartir</button>
-      <button class="btn btn-ghost" onclick="exportPDF('mobile')" title="PDF optimizado para pantalla de celular">📱 PDF celular</button>
-      <button class="btn btn-ghost" onclick="exportPDF('print')" title="PDF para imprimir en A4">🖨️ PDF imprimir</button>
+      <button class="social-btn" onclick="showShareModal()" title="Compartir código">🔗</button>
+      <button class="social-btn" onclick="exportPDF('mobile')" title="PDF optimizado para pantalla de celular">📱</button>
+      <button class="social-btn" onclick="exportPDF('print')" title="PDF para imprimir en A4">🖨️</button>
     </div>
   </div>
 
@@ -1735,10 +1734,13 @@ function updateBanner() {
   // poder inyectar HTML/JS. Escapamos cada fragmento de texto individualmente
   // (no la cadena ya armada con <span>) para que el "&" real de la pareja no
   // se confunda con el HTML que agregamos para resaltarlo.
+  // Solo tratamos "y" como conector cuando aparece como palabra suelta
+  // (con espacios alrededor) — así nombres como "Yency", "Katy" o "Freddy"
+  // no se cortan por tener una "y" en cualquier parte del texto.
   let html;
-  if (names.includes('&') || names.includes('y')) {
-    html = names.split(/(&|y)/g)
-      .map(part => (part === '&' || part === 'y') ? `<span>${escHtml(part)}</span>` : escHtml(part))
+  if (names.includes('&') || /\sy\s/.test(names)) {
+    html = names.split(/(&|\s+y\s+)/g)
+      .map(part => (part === '&' || /^\s+y\s+$/.test(part)) ? `<span>${escHtml(part)}</span>` : escHtml(part))
       .join('');
   } else {
     html = `<span>${escHtml(names)}</span>`;
@@ -2013,7 +2015,8 @@ function renderTimeline() {
       <div class="ev-content-col">
         <div class="ev-name-row">
           <div class="ev-name" contenteditable="true" onblur="updateName('${ev.id}',this)"
-            spellcheck="false">${escHtml(ev.name)}${ev.highlight ? ' <span class="ev-star">⭐</span>' : ''}</div>
+            spellcheck="false">${escHtml(ev.name)}</div>
+          ${ev.highlight ? '<span class="ev-star">⭐</span>' : ''}
           <div class="event-actions">
             <button class="btn-icon move-btn" onclick="moveEvent('${ev.id}',-1)" title="Mover arriba" ${isFirst ? 'disabled' : ''}>▲</button>
             <button class="btn-icon move-btn" onclick="moveEvent('${ev.id}',1)" title="Mover abajo" ${isLast ? 'disabled' : ''}>▼</button>
@@ -2135,7 +2138,9 @@ function deleteEvent(id) {
 function updateName(id, el) {
   const ev = state.events.find(e => e.id === id);
   if (!ev) return;
-  const newName = el.textContent.trim();
+  // Quita cualquier "⭐" que haya quedado pegado al final del texto (residuo del
+  // bug anterior, cuando la estrella vivía dentro del mismo contenteditable).
+  const newName = el.textContent.replace(/\s*⭐\s*$/, '').trim();
   if (!newName) {
     // Si el usuario borra todo, revertimos al nombre anterior para no quedar en blanco
     el.textContent = ev.name;
@@ -2262,7 +2267,10 @@ function exportPDF(mode = 'print') {
 
   let y = isMobile ? DIVIDER_Y + 5 : START_Y;
   let lastSec = null;
-  const pdfEvents = [...state.events].sort((a,b) => minutesOf(a) - minutesOf(b));
+  // Mismo criterio de orden que usa la app en pantalla (campo "order"),
+  // para que el PDF no reordene momentos que la pareja ya acomodó a mano
+  // arrastrando o con las flechas (antes se reordenaba solo por hora).
+  const pdfEvents = [...state.events].sort((a,b) => (a.order ?? 0) - (b.order ?? 0));
 
   pdfEvents.forEach((ev, i) => {
     const sec = getSectionLabel(ev);
@@ -2378,7 +2386,7 @@ function exportPDF(mode = 'print') {
   // o Confirmado, sin este requisito extra).
   const pdfProviders = (state.providers || []).filter(p => {
     if (p.isExample) {
-      const stillPlaceholder = (p.name || '').trim().startsWith('Ej:');
+      const stillPlaceholder = [p.name, p.service, p.phone].some(v => (v || '').trim().startsWith('Ej:'));
       return p.done && !stillPlaceholder;
     }
     return true;
