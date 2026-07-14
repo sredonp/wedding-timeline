@@ -558,7 +558,7 @@
     font-family: var(--font-body);
     font-weight: 600;
     box-shadow: 0 10px 26px rgba(75,58,82,.3);
-    transition: .15s;
+    transition: .25s;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -567,6 +567,12 @@
   }
   .fab-add:hover { background: var(--rose); transform: translateX(-50%) translateY(-2px); }
   .fab-add:active { transform: translateX(-50%) scale(.97); }
+  /* Se oculta suavemente al llegar al pie de página, para no tapar la marca */
+  .fab-add.fab-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) translateY(20px);
+  }
 
   /* ── MODAL ── */
   .modal-overlay {
@@ -1032,7 +1038,7 @@
   </div>
 
   <!-- BOTÓN FLOTANTE: AÑADIR MOMENTO -->
-  <button class="fab-add" onclick="openAddModal()" title="Añadir momento">
+  <button class="fab-add" id="fab-add-btn" onclick="openAddModal()" title="Añadir momento">
     <span style="font-size:18px;line-height:1">+</span> Añadir momento
   </button>
 
@@ -1520,6 +1526,22 @@ function showApp() {
   renderTimeline();
   initSortable();
   document.getElementById('notes-textarea').value = state.notes || '';
+  setupFabAutoHide();
+}
+
+// Oculta el botón flotante "+ Añadir momento" cuando el pie de página
+// (marca, redes, WhatsApp) entra en pantalla, para no taparlo.
+let fabObserver = null;
+function setupFabAutoHide() {
+  const fab = document.getElementById('fab-add-btn');
+  const footer = document.querySelector('.site-footer');
+  if (!fab || !footer || fabObserver) return;
+  fabObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      fab.classList.toggle('fab-hidden', entry.isIntersecting);
+    });
+  }, { rootMargin: '0px 0px -10% 0px' });
+  fabObserver.observe(footer);
 }
 
 function resetApp() {
