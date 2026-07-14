@@ -1209,7 +1209,7 @@
       <div class="modal-row">
         <div>
           <div class="field-label">Duración (minutos)</div>
-          <input class="field-input" id="ev-duration" type="number" inputmode="numeric" min="5" max="480" step="5" placeholder="30" value="30">
+          <input class="field-input" id="ev-duration" type="number" inputmode="numeric" min="0" max="480" step="5" placeholder="30" value="30">
         </div>
         <div>
           <div class="field-label">Categoría</div>
@@ -2079,7 +2079,7 @@ function saveEvent() {
   if (!name) { showToast('El nombre no puede estar vacío'); return; }
   const hour = Math.max(0, Math.min(23, parseInt(document.getElementById('ev-hours').value) || 0));
   const minute = Math.max(0, Math.min(59, parseInt(document.getElementById('ev-minutes').value) || 0));
-  const duration = Math.max(5, parseInt(document.getElementById('ev-duration').value) || 30);
+  const duration = Math.max(0, parseInt(document.getElementById('ev-duration').value) || 0);
   const cat = document.getElementById('ev-category').value;
   const notes = document.getElementById('ev-notes').value.trim();
   const highlight = document.getElementById('ev-highlight').checked;
