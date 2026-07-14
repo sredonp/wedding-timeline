@@ -1131,6 +1131,11 @@
     </div>
   </div>
 
+  <!-- TIMELINE -->
+  <div class="timeline-wrap">
+    <div id="timeline-list"></div>
+  </div>
+
   <!-- PROVEEDORES -->
   <div class="notes-wrap providers-wrap">
     <div class="notes-card">
@@ -1138,11 +1143,6 @@
       <div id="providers-list"></div>
       <button class="provider-add-btn" onclick="addProvider()">+ Agregar proveedor</button>
     </div>
-  </div>
-
-  <!-- TIMELINE -->
-  <div class="timeline-wrap">
-    <div id="timeline-list"></div>
   </div>
 
   <!-- BOTÓN FLOTANTE: AÑADIR MOMENTO -->
@@ -1830,13 +1830,41 @@ function buildProviderRow(p) {
     callBtn.textContent = '📞 ' + (p.phone || '');
     fields.appendChild(callBtn);
   } else {
+    const phoneWrap = document.createElement('div');
+    phoneWrap.style.cssText = 'display:flex;gap:5px;align-items:center;';
+
     const phoneInput = document.createElement('input');
     phoneInput.className = 'provider-input';
     phoneInput.placeholder = 'Teléfono';
     phoneInput.type = 'tel';
     phoneInput.value = p.phone || '';
-    phoneInput.oninput = () => updateProviderField(p.id, 'phone', phoneInput.value);
-    fields.appendChild(phoneInput);
+    phoneInput.style.flex = '1';
+    phoneInput.oninput = () => {
+      updateProviderField(p.id, 'phone', phoneInput.value);
+      callLink.href = 'tel:' + phoneInput.value.replace(/[^0-9+]/g, '');
+      callLink.style.display = phoneInput.value.trim() ? 'flex' : 'none';
+    };
+
+    const callLink = document.createElement('a');
+    callLink.href = 'tel:' + (p.phone || '').replace(/[^0-9+]/g, '');
+    callLink.title = 'Llamar';
+    callLink.style.cssText = `
+      display:${p.phone ? 'flex' : 'none'};
+      align-items:center;justify-content:center;
+      width:34px;height:34px;flex-shrink:0;
+      border-radius:var(--radius-sm);
+      border:1px solid var(--gold);
+      background:#fff;color:var(--gold);
+      font-size:15px;text-decoration:none;
+      transition:background .15s;
+    `;
+    callLink.textContent = '📞';
+    callLink.onmouseenter = () => { callLink.style.background = 'rgba(176,141,87,0.1)'; };
+    callLink.onmouseleave = () => { callLink.style.background = '#fff'; };
+
+    phoneWrap.appendChild(phoneInput);
+    phoneWrap.appendChild(callLink);
+    fields.appendChild(phoneWrap);
   }
 
   row.appendChild(fields);
